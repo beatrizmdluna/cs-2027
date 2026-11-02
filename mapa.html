@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa de Customer Success 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F4F3F8;--surface:#FFFFFF;--surface-2:#ECE9F4;--ink:#1A1628;--muted:#5C566F;--line:#D9D4E5;
+  --accent:#5B2DBF;--accent-soft:#E8E0FA;--accent-ink:#FFFFFF;
+  --o-existe:#11805A;--o-evolui:#A65F00;--o-diretoria:#22609F;--o-novo:#5B2DBF;
+  --p1:#0D7480;--p2:#B9450F;--p3:#A3326C;--p4:#5C566F;
+  --shadow:0 1px 2px rgba(26,22,40,.06),0 6px 18px rgba(26,22,40,.06);
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#110F18;--surface:#1A1724;--surface-2:#242033;--ink:#ECE9F5;--muted:#A49EB8;--line:#332E46;
+  --accent:#A68DFF;--accent-soft:#2C2550;--accent-ink:#110F18;
+  --o-existe:#3DC28C;--o-evolui:#E3A443;--o-diretoria:#6FA8EA;--o-novo:#A68DFF;
+  --p1:#3EC3CD;--p2:#F08250;--p3:#E57AB3;--p4:#A49EB8;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);color-scheme:dark;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding:28px 16px 56px}
+.wrap{max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3,h4{font-family:var(--f-display);font-stretch:112%;margin:0;line-height:1.12;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.top h1{font-size:clamp(28px,4.4vw,46px);font-weight:800;letter-spacing:-.01em}
+.top h1 em{font-style:normal;color:var(--accent)}
+.lead{max-width:78ch;color:var(--muted);font-size:16px;margin-top:10px}
+
+.controls{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row>.eyebrow{min-width:120px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.d-existe{background:var(--o-existe)}.d-evolui{background:var(--o-evolui)}.d-diretoria{background:var(--o-diretoria)}.d-novo{background:var(--o-novo)}
+.count{font-family:var(--f-mono);font-size:11px;opacity:.75}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:22px;align-items:start}
+.map{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;overflow-x:auto}
+.map-inner{position:relative;min-width:980px}
+svg.links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+svg.links path{fill:none;stroke-width:1.6;opacity:.55}
+.tree{display:grid;grid-template-columns:200px minmax(0,1fr);gap:0 56px;align-items:center;position:relative}
+.root{grid-row:1/span 4;align-self:center}
+.branches{display:flex;flex-direction:column;gap:26px}
+.branch{display:grid;grid-template-columns:190px minmax(0,1fr);gap:0 48px;align-items:center}
+.subs{display:flex;flex-direction:column;gap:16px}
+.sub{display:grid;grid-template-columns:200px minmax(0,1fr);gap:0 40px;align-items:center}
+.leaves{display:flex;flex-direction:column;gap:6px}
+
+.node{position:relative;text-align:left;display:flex;flex-direction:column;gap:3px;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;min-width:0;width:100%;transition:opacity .2s,border-color .15s,transform .15s,box-shadow .15s}
+.node:hover{border-color:var(--ink);transform:translateY(-1px)}
+.node.selected{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.node .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.node .t{font-weight:700;font-size:14px;line-height:1.25}
+.node.n-root{background:var(--ink);color:var(--bg);border-color:var(--ink);padding:16px}
+.node.n-root .k{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.node.n-root .t{font-family:var(--f-display);font-stretch:112%;font-size:20px;font-weight:800}
+.node.n-root .s{font-size:12.5px;opacity:.8}
+.node.n-pillar{background:var(--surface);border-width:2px}
+.node.n-pillar .t{font-family:var(--f-display);font-stretch:112%;font-size:17px;font-weight:800}
+.node.n-sub{background:var(--surface)}
+.node.n-leaf{flex-direction:row;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--surface)}
+.node.n-leaf .t{font-weight:600;font-size:13px}
+.node.n-leaf .dot{width:8px;height:8px}
+.node .open{font-family:var(--f-mono);font-size:10px;color:var(--o-evolui);margin-left:auto;white-space:nowrap}
+.filtering .node.n-leaf:not(.match){opacity:.22}
+
+.panel{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:14px}
+.p-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:2px 9px;background:var(--bg)}
+.p-title{font-size:23px;font-weight:800}
+.p-sum{color:var(--muted);font-size:14.5px}
+.p-sec{display:flex;flex-direction:column;gap:5px;margin-top:2px}
+#panelBody{display:flex;flex-direction:column;gap:14px}
+.p-sec h4{font-family:var(--f-mono);font-stretch:100%;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.p-sec p,.p-sec li{font-size:14px}
+.p-sec ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.p-before{border-left:3px dashed var(--muted);padding-left:10px}
+.p-after{border-left:3px solid var(--accent);padding-left:10px}
+.p-open{background:color-mix(in srgb,var(--o-evolui) 14%,transparent);border-radius:10px;padding:10px 12px}
+.p-src{font-size:12px;color:var(--muted)}
+.p-details{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.flow{display:flex;flex-direction:column;gap:8px}
+.flow-row{display:grid;grid-template-columns:18px 1fr 18px 104px;grid-template-areas:'nat nat nat nat' 'a1 act a2 dest';gap:4px;align-items:stretch;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.flow-row>:nth-child(1){grid-area:nat}.flow-row>:nth-child(2){grid-area:a1}.flow-row>:nth-child(3){grid-area:act}.flow-row>:nth-child(4){grid-area:a2}.flow-row>:nth-child(5){grid-area:dest}
+.flow-row>:nth-child(2){font-size:0}.flow-row>:nth-child(2)::after{content:'↳';font-size:15px}
+.fbox{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;font-size:12px;line-height:1.3}
+.fbox b{font-size:12.5px}.fbox span{color:var(--muted)}
+.f-nat{border-left:3px solid var(--p2)}.f-pos{border-left-color:var(--o-existe)}
+.f-dest{background:var(--accent-soft);border-color:transparent;justify-content:center}
+.farrow{display:grid;place-items:center;color:var(--muted);font-weight:700}
+.vnote{font-size:13px;color:var(--muted)}
+.vsteps{display:flex;flex-direction:column;gap:0;border-left:2px solid var(--line);margin-left:10px}
+.vstep{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:6px 0 6px 0;margin-left:-12px}
+.vstep i{font-style:normal;font-family:var(--f-mono);font-size:11px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--bg)}
+.vstep b{display:block;font-size:13px}.vstep span{font-size:12.5px;color:var(--muted)}
+.vlink{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13px}
+.vlink ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.fc{display:grid;grid-template-columns:1.4fr 20px 1fr;gap:8px;align-items:center}
+.fc h5{margin:0 0 4px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.fc-row{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 0;justify-content:space-between}
+.fc-row span:first-child{display:inline-flex;align-items:center;gap:6px;flex:1}
+.fc .bar{flex:1;height:5px;background:var(--surface-2);border-radius:3px;overflow:hidden;max-width:70px}
+.fc .bar i{display:block;height:100%;background:var(--accent)}
+.fc-x{font-weight:800;color:var(--muted);text-align:center}
+
+.p-kids{display:flex;flex-wrap:wrap;gap:6px}
+.p-kids button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:4px 9px;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.p-kids button:hover{border-color:var(--ink)}
+.p-nav{display:flex;gap:8px;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px}
+.p-nav button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 10px;font-size:12.5px;cursor:pointer;max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-nav button:disabled{opacity:.4;cursor:default}
+.panel-close{display:none}
+
+.summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.sumcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.sumcard b{font-family:var(--f-display);font-stretch:100%;font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.sumcard span{font-size:13px;color:var(--muted)}
+.foot{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;max-width:95ch}
+
+@media (max-width:1100px){
+  .layout{grid-template-columns:1fr}
+  .panel{position:fixed;left:0;right:0;bottom:0;top:auto;max-height:72vh;border-radius:16px 16px 0 0;z-index:20;transform:translateY(105%);transition:transform .25s}
+  .panel.show{transform:none}
+  .panel-close{display:inline-flex;align-self:flex-end;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:13px}
+}
+@media (max-width:760px){
+  .map-inner{min-width:0}
+  svg.links{display:none}
+  .tree,.branch,.sub{grid-template-columns:1fr;gap:10px}
+  .branches{gap:20px}
+  .subs{padding-left:14px;border-left:2px solid var(--line)}
+  .leaves{padding-left:14px;border-left:2px dashed var(--line)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Proposta de Beatriz Luna · Gerência de Customer Success · PFL 2026.2</div>
+    <h1>CS como a ponte entre o <em>CRM</em> e a <em>gestão de projetos</em></h1>
+    <p class="lead">Mapa de tudo o que a Gerência de Customer Success é e se propõe a ser em 2027: o que já existe hoje, o que evolui a partir do Framework de 2026, o que vem das propostas das diretorias eleitas e o que é novo nesta proposta. Clique em qualquer ramo para ver o detalhe.</p>
+  </header>
+
+  <section class="summary" id="summary" aria-label="Resumo por origem"></section>
+
+  <section class="controls" aria-label="Filtros">
+    <div class="row"><span class="eyebrow">Destacar origem</span><div class="row" id="filters"></div></div>
+  </section>
+
+  <div class="layout">
+    <section class="map" aria-label="Mapa da proposta">
+      <div class="map-inner" id="mapInner">
+        <svg class="links" id="links" aria-hidden="true"></svg>
+        <div class="tree" id="tree"></div>
+      </div>
+    </section>
+    <aside class="panel" id="panel" aria-live="polite">
+      <button class="panel-close" id="panelClose">Fechar</button>
+      <div id="panelBody"></div>
+    </aside>
+  </div>
+
+  <p class="foot">Fontes: Framework de Atendimento e Customer Success (jul/2026), Estratégia de CS e Planos de ação (jun/2026), reuniões com a atual gerente de CS (19, 21 e 25/10 e 31/10), depoimentos de gerentes e lideranças de Desenvolvimento e Dados, proposta da Diretoria de Soluções 2027 (Júlia Andrade) e da Diretoria de Negócios 2027 (Tiago Lucena), dados de CRM 2023–2026. Itens marcados como “em aberto” aguardam confirmação.</p>
+</div>
+
+<script>
+const ORIG={
+  existe:{label:"Já existe",desc:"Prática atual de CS, mantida"},
+  evolui:{label:"Evolui de 2026",desc:"Desenhado em 2026, muda de forma"},
+  diretoria:{label:"Das diretorias 2027",desc:"Proposto por CTO ou CRO; CS operacionaliza"},
+  novo:{label:"Novo nesta proposta",desc:"Autoral"}
+};
+const PCOLOR={p1:"var(--p1)",p2:"var(--p2)",p3:"var(--p3)",p4:"var(--p4)"};
+
+const DATA={
+ id:"root",kind:"Visão",title:"Customer Success CITi 2027",sub:"Termômetro de Soluções e alavanca de Negócios",
+ summary:"CS é a dona do resultado que a solução gera no negócio do cliente: a função que hoje fica secundária tanto para o analista de Negócios, que precisa manter o funil cheio, quanto para o gerente de projeto, focado em entregar no prazo. Em 2027, CS deixa de atuar como um medidor do projeto e passa a ser a ponte entre o CRM e a gestão de projetos.",
+ before:"CS foi criada em julho de 2026, com uma pessoa acumulando o estratégico e o operacional. Em 2026, os clientes antigos responderam por menos de 2% do faturamento, enquanto indicações convertem cerca de 40% e a prospecção ativa, cerca de 1%.",
+ after:"Três pilares que fazem funcionar, no dia a dia, a jornada do cliente e o que as diretorias de Soluções e de Negócios desenharam: Jornada do Cliente, Termômetro de Soluções e Alavanca de Negócios, com interfaces definidas com todas as subáreas.",
+ children:[
+ {id:"p1",color:"p1",kind:"Pilar 1",title:"Jornada do Cliente",
+  summary:"Garantir que todo cliente do CITi viva uma jornada contínua e consistente, da venda ao pós-projeto, com um responsável claro pelo seu sucesso em cada etapa e sem que o contexto construído com ele se perca entre fases, independentemente do projeto, gerente ou de quem esteja à frente da área.",
+  children:[
+   {id:"p1s1",kind:"Subpilar 1.1",title:"Do pré-projeto ao pós-venda",
+    summary:"Encaixar os contatos de CS na rotina dos projetos, do pré-projeto à implementação assistida do pós-venda, com a intensidade do acompanhamento ajustada à saúde de cada conta, variações para cada tipo de projeto e continuidade depois da entrega, no momento em que o cliente decide se volta ou não.",
+    before:"Parte do Framework de Atendimento e Customer Success de 2026 chegou à prática; outra parte não saiu do papel ou não foi incorporada de forma eficaz à rotina de quem precisava executá-la. Cada gerente conduz o projeto do seu jeito, e a falta de combinados claros desde o início já gerou confusão e desgaste com clientes. A implementação assistida passa a existir nos novos projetos, e ainda não há critérios para a atuação de CS nessa etapa.",
+    after:"A reestruturação da jornada é construída com foco na aplicabilidade ao contexto do CITi: encaixada na rotina dos projetos, estendida do pré-projeto ao pós-venda e firmada à atuação de CS na implementação assistida.",
+    result:"Uma jornada do cliente vigente em todos os projetos sem depender de quem os conduz. Experiência consistente para todos os clientes, riscos tratados antes de virarem insatisfação e, pela primeira vez, um acompanhamento que continua depois da entrega.",
+    children:[
+     {id:"l-sucesso",origin:"evolui",title:"Reunião de sucesso no início do projeto",summary:"Continua sendo o ponto de partida da jornada, com o roteiro de perguntas construído em 2026.",before:"CS conduz a reunião e gera um documento com os critérios de sucesso, entregue ao gerente para guiar o projeto e comparar se os critérios foram atingidos.",after:"O documento passa a ficar registrado também na conta do pipe de CS no CITi Flow e visível para o cliente no dashboard de acompanhamento.",details:["Roteiro com versões completa (~50 min) e econômica (~25 min), com núcleo fixo de perguntas e parte adaptada a cada cliente.","Na mesma reunião, CS combina com o cliente a cadência dos seus contatos."],src:"Roteiros ESTAF e Visus; reunião com a atual gerente de CS (31/10)."},
+     {id:"l-cadencia",origin:"existe",title:"Cadência combinada com cada cliente",summary:"CS combina a frequência dos seus contatos conforme o que for mais conveniente para o cliente.",before:"Já acontece: no ValeDOC, reunião mensal na última terça do mês; em outro projeto, o cliente preferiu menos contatos por não ter feedback suficiente no período.",after:"Mantida como parte da reunião de sucesso.",src:"Reunião com a atual gerente de CS (31/10)."},
+     {id:"l-fases",origin:"evolui",title:"Contatos encaixados nas fases do cronograma",summary:"Os contatos de CS acompanham as fases do cronograma de entregas que os gerentes já utilizam, e não uma agenda paralela.",before:"O Framework de 2026 previa contatos de CS nos pontos de entrega, como um plano paralelo à rotina dos gerentes.",after:"Os contatos seguem o cronograma de entregas por fases, prática já adotada em projetos como ValeDOC e Acreditar.",details:["Exemplo ValeDOC: ~7 meses, ~30 sprints semanais divididas em fases; cada sprint com uma validação concreta para o cliente.","CS aproveita a reunião semanal que o gerente já tem com o cliente, ao fim de cada fase."],src:"Framework 2026; depoimentos dos gerentes de Desenvolvimento e de Dados; cronograma ValeDOC.",open:"Hiperlink com desenho dos contatos por cronograma."},
+     {id:"l-perguntas",origin:"novo",title:"Três perguntas fixas por marco de projeto",summary:"Sempre as mesmas, para comparar a percepção do cliente ao longo do projeto e entre projetos diferentes.",before:"Perguntas abertas, sem padrão que permita comparação.",after:"Feitas ao fim de cada marco, aproveitando a reunião do gerente e, quando necessário, sem a presença do time, prática que já funciona em alguns projetos.",details:["Valor percebido: “O que foi entregue nesta fase já faz diferença na sua rotina?”","Andamento: “Há algo que te preocupa no andamento ou na comunicação com o time?”","Confiança: “De 1 a 5, quanto você confia que o projeto vai alcançar o resultado esperado?”","Marcos: no Discovery, as três entregas principais; no Delivery, as entregas mais importantes; no Synergy, os onboardings e entregas das iniciativas.","As respostas alimentam o eixo de valor percebido do monitoramento de saúde."],src:"Proposta; prática atual no ValeDOC.",open:"Hiperlink com as perguntas por marco."},
+     {id:"l-intensidade",origin:"novo",title:"Intensidade definida pela saúde",summary:"Contas saudáveis seguem a jornada base, contas em atenção recebem mais proximidade e contas em risco entram em recuperação.",before:"Segmentação por porte (tiers) desenhada em 2026 e abandonada por falta de volume, com cerca de 11 contas.",after:"A atenção de CS vai para onde é mais necessária, independentemente do porte do cliente.",details:["Verde: jornada base.","Amarelo: contato extra de CS e alinhamento com o gerente na mesma semana.","Vermelho: recuperação."],src:"Estratégia de CS (jun/2026); depoimento do gerente de Dados (Acreditar x Visus)."},
+     {id:"l-recuperacao",origin:"evolui",title:"Recuperação com foco na causa raiz",summary:"Identifica a causa que levou a conta até ali e a devolve a quem pode evitar que se repita.",before:"Lógica de recuperação desenhada em 2026, ainda não aplicada a nenhuma conta por nenhuma ter chegado a esse nível.",after:"O plano de ação é montado a partir do entendimento do problema, e a causa vai à gestão do projeto, a Negócios ou ao playbook de CS.",details:["Entendimento interno comum: o que aconteceu, impacto e responsabilidades.","Plano de ação com responsáveis, prazos e forma de comunicação com o cliente.","Encerramento só quando o cliente recebeu retorno e há evidência de melhora.","Gatilhos que tornam a conta crítica (desenho de 2026): ameaça de cancelamento, perda explícita de confiança, reclamação grave sem tratamento, rejeição recorrente de entregas, ruptura com pessoa-chave."],src:"Estratégia de CS (jun/2026)."},
+     {id:"l-versoes",origin:"novo",title:"Versões da jornada por tipo de projeto",summary:"Discovery, Delivery e Synergy, respeitando o ritmo e os momentos de valor de cada um.",before:"O Framework não detalhava variações por tipo de projeto.",after:"Cada tipo de projeto tem seus próprios marcos de contato.",details:["Discovery: reunião de sucesso, contato após o diagnóstico operacional (primeiro momento de valor percebido) e entrega do business case.","Delivery: contatos pelas fases do cronograma de entregas.","Synergy: contato na validação do onboarding de cada demanda, na entrega da implementação e revisão trimestral da conta."],src:"Depoimentos dos gerentes de Dados (Synergy ARA) e de Produto.",open:"Hiperlink com as versões da jornada por tipo de projeto."},
+     {id:"l-posentrega",origin:"diretoria",title:"Continuidade depois da entrega",summary:"A jornada deixa de terminar no encerramento e segue pela implementação assistida e pela relação com a conta.",before:"A jornada terminava no encerramento. Como CS nasceu em julho de 2026, poucos projetos acompanhados chegaram a essa etapa.",after:"Implementação assistida proposta para a gestão, com o papel de CS definido. Projetos próximos do fim já entram nessa etapa no início da gestão, para que ela seja testada desde o primeiro mês.",src:"Proposta da Diretoria de Negócios 2027; proposta da Diretoria de Soluções 2027."},
+     {id:"l-cx",origin:"novo",title:"Padrão de experiência com CX",summary:"CX produz os materiais base da jornada padrão e de seus momentos-chave; CS os adapta e aplica em cada cliente.",before:"A interface com CX virou “repasse em cima de repasse”, porque CX não tinha o contexto de cada projeto. O guidebook de onboarding já é enviado aos clientes.",after:"Divisão entre macro (CX define o padrão para todo o CITi) e micro (CS aplica em cada cliente). Ações personalizadas para um cliente ficam com CS, ou são pedidas a CX de forma pontual, sem depender de repasses.",details:["CX: tom de comunicação, guidebook de onboarding, materiais de momentos-chave como onboarding e encerramento.","CS: adaptação ao contexto da conta, a partir do que já está registrado no CITi Flow."],src:"Reuniões com a atual gerente de CS (19 e 25/10); Framework 2026."},
+     {id:"l-playbook",origin:"novo",title:"Playbook construído ao longo da gestão",summary:"A jornada começa pelos projetos novos, é revisada mensalmente e se consolida em um playbook.",before:"O conhecimento de como acompanhar um cliente está na experiência de quem ocupa o cargo.",after:"Revisões mensais com base no que clientes e gerentes trazem; playbook entregue ao fim da gestão, como base para a próxima.",src:"Proposta.",open:"Definir onde fica a documentação da área (Notion ou Drive)."}
+    ]},
+   {id:"p1s2",kind:"Subpilar 1.2",title:"Papéis e passagens de bastão",
+    summary:"Definir com clareza o papel de CS, do analista de Negócios e do gerente de projeto em cada etapa da jornada, estruturando as passagens de bastão da venda ao pós-projeto, para que o contexto do cliente e as oportunidades identificadas não se percam.",
+    before:"O analista de Negócios precisa manter o funil cheio e o gerente de projeto está concentrado em entregar no prazo; o resultado no negócio do cliente fica secundário para os dois. A divisão com CS ainda não é bem definida, e a passagem de bastão desenhada em 2026 não se consolidou por depender de registro manual. As dores fora do escopo não são registradas.",
+    after:"Estruturação bem definida de quem responde pelo quê em cada etapa, com passagens de bastão integradas.",
+    result:"Uma divisão clara de quem responde pelo quê e passagens que não perdem informação. O cliente deixa de repetir o que já contou ou de receber contatos desencontrados, e as dores que antes se perdiam no diagnóstico passam a alimentar novas oportunidades.",
+    children:[
+     {id:"l-planning",origin:"existe",title:"CS na planning comercial",summary:"Participação semanal, às segundas, acompanhando o que está prestes a fechar.",before:"Já acontece.",after:"Mantida, para chegar a cada novo projeto com contexto.",src:"Prática atual da área."},
+     {id:"l-matriz",origin:"novo",title:"Matriz de papéis",summary:"Construída junto aos gerentes e à diretoria para cada etapa da jornada.",before:"Papéis indefinidos; a proposta da Diretoria de Negócios cria o analista titular da conta, e a de Soluções a nova estrutura de Engenharia de Soluções.",after:"Cada papel fala com o cliente com um propósito diferente, evitando contatos duplicados.",details:["Gerente de projeto: conduz a entrega e o dia a dia com o cliente, como PO do que está sendo construído.","Analista de Negócios: conduz a relação comercial, proposta, contrato e negociação.","CS: responde pela jornada, pela saúde da conta e pelo valor percebido.","Propósito dos contatos: gerente, andamento semanal; CS, valor e relação nos marcos; analista, momentos comerciais."],src:"Proposta; propostas das diretorias 2027; depoimento do líder de Desenvolvimento."},
+     {id:"l-venda",origin:"evolui",title:"Passagem da venda registrada",summary:"Quando a venda é fechada no CRM, o projeto nasce automaticamente no pipe de CS do CITi Flow, com o histórico de Negócios.",before:"Handoff no CITi Tracker desenhado em 2026, que caiu em desuso por depender de preenchimento.",after:"O card nasce com o histórico registrado por Negócios, já com as dores relatadas no diagnóstico que ficaram fora do escopo.",details:["O que o handoff de 2026 previa repassar: o que foi prometido (inclusive informalmente), sinais de risco, perfil do decisor, orçamento e prazo reais, o que o diagnóstico levantou.","Criação automática do card entre pipes confirmada como viável com Inovação."],src:"Framework 2026; Inovação."},
+     {id:"l-transicoes",origin:"novo",title:"CS presente em todas as transições",summary:"CS acompanha as três passagens da jornada, e o cliente mantém um rosto constante enquanto o time muda.",before:"CS já participa do onboarding da solução no início do Delivery; a passagem técnica entre gerentes é interna.",after:"Três momentos com CS presente.",details:["Venda → projeto: alinhamento com analista e gerente do que ainda estiver em aberto.","Discovery → Delivery: onboarding da solução com o cliente.","Delivery → implementação assistida: plano da etapa definido com o cliente."],src:"Proposta; prática atual.",open:"Confirmar se, no onboarding do Delivery, as perguntas da reunião de sucesso já são retomadas."},
+     {id:"l-apoio",origin:"existe",title:"Apoio ao gerente",summary:"CS apoia os gerentes nos momentos delicados da relação com o cliente.",before:"Já acontece; citado por gerentes de Desenvolvimento e de Dados como um dos maiores valores de CS.",after:"Mantido.",src:"Depoimentos dos gerentes de Desenvolvimento e de Dados."}
+    ]}
+  ]},
+ {id:"p2",color:"p2",kind:"Pilar 2",title:"Termômetro de Soluções",
+  summary:"Saber, a qualquer momento, como está cada cliente e por quê, antecipando riscos antes que se tornem insatisfação e levando ativamente a voz do cliente e sua percepção para a melhoria contínua da operação de Soluções.",
+  children:[
+   {id:"p2s1",kind:"Subpilar 2.1",title:"Monitoramento da saúde das contas",
+    summary:"Proporcionar uma visão única da carteira, por meio do acompanhamento da saúde de cada conta registrada por CS com base nos contatos com o cliente, medida de forma diferente antes e depois da entrega e consolidada por projeto e por conta.",
+    before:"Não existe uma visão única de como estão os clientes, e cada gerente acompanha o projeto do seu jeito, em ferramentas diferentes. O semáforo desenhado nesta gestão dependia de os gerentes preencherem uma plataforma separada e caiu em desuso. CS dedica boa parte do tempo a buscar informações, e os problemas costumam ser percebidos quando o cliente já está insatisfeito. Com a implementação assistida, a lacuna fica mais evidente.",
+    after:"Acompanhamento integrado ao CITi Flow, com estado em tempo real de cada conta e forecast de expansão baseado em critérios definidos.",
+    result:"Uma visão única e atualizada de como está cada cliente. CS deixa de gastar tempo buscando informações para agir sobre elas, e os problemas passam a ser percebidos antes que o cliente reclame. Dessa forma, podemos antecipar riscos e prever a receita que a base pode gerar.",
+    children:[
+     {id:"l-conta",origin:"novo",title:"A conta como centro no CITi Flow",summary:"Um registro único por cliente, ligado ao pipe de Comercial e ao pipe de CS.",before:"Oportunidades e projetos sem centralização por empresa; plataforma interna de CS separada do restante da operação.",after:"O projeto nasce no pipe de CS quando a venda é fechada, e as oportunidades qualificadas por CS voltam ao pipe de Comercial. CS se torna a ponte entre o CRM e a gestão de projetos.",details:["CITi Flow como fonte única proposta pela Diretoria de Soluções; plataforma interna de CS descontinuada.","Oportunidades de volta ao Comercial com origem “base” ou “indicação”.","Registro por conta e transferência entre pipes confirmados como viáveis com Inovação."],src:"Proposta; proposta da Diretoria de Soluções 2027; Inovação."},
+     {id:"l-tracker",origin:"evolui",title:"Construção a partir do CITi Tracker",summary:"O pipe de CS herda a estrutura de dados já desenhada em 2026.",before:"CITi Tracker com critérios de sucesso, riscos, oportunidades e primeiro momento de valor, em desuso.",after:"Estrutura reaproveitada como requisito do pipe, mapeando o que já existe e o que precisa ser criado para servir ao acompanhamento dos projetos e a Negócios.",src:"Roteiros ESTAF e Visus; proposta da Diretoria de Soluções 2027."},
+     {id:"l-semaforo",origin:"evolui",title:"Semáforo de 2026 como base",summary:"Prazo, escopo, dependências do cliente e relacionamento, com suas regras.",before:"Desenhado para ser preenchido pelos gerentes a cada sprint ou review; caiu em desuso.",after:"Critérios e regras mantidos, com novas dimensões e outra forma de registro.",details:["Regra da pior cor: a cor final do projeto é a pior entre os eixos.","Índice de atenção: soma dos eixos (verde 0, amarelo 1, vermelho 2) mostra se o projeto piora dentro da mesma cor.","Escalonamento: o mesmo eixo amarelo por dois ciclos vira vermelho.","Relacionamento em nota de 1 a 5, de “pediu escalonamento” a “elogia o time em reunião”."],src:"Semáforo de saúde (2026)."},
+     {id:"l-duasfases",origin:"evolui",title:"Saúde medida antes e depois da entrega",summary:"Durante o projeto, soma o valor percebido aos eixos de execução; depois da entrega, considera adoção e indicadores.",before:"O semáforo foi desenhado para a fase de execução, e o Framework de 2026 já previa um pós-projeto. Como apenas um projeto foi entregue até agora, e muito recentemente, a medição depois da entrega ainda não teve oportunidade de acontecer.",after:"Duas leituras de saúde, uma para cada fase da relação.",details:["Durante o projeto: prazo, escopo, dependências, relacionamento e valor percebido (perguntas por marco, primeiro momento de valor).","Depois da entrega: adoção da solução, avanço dos indicadores do Discovery, relacionamento e ocorrências na garantia.","Saúde registrada por projeto, com um fechamento ao final, e consolidada por conta (essencial em Synergy ou retainer)."],src:"Framework 2026; proposta da Diretoria de Soluções 2027; benchmark de mercado."},
+     {id:"l-registro-saude",origin:"novo",title:"Registro da saúde",summary:"A saúde é registrada a partir dos contatos de CS com o cliente, apoiada pelas reuniões transcritas, pelo dashboard e pelo formulário de satisfação.",before:"O semáforo caiu em desuso por depender do preenchimento dos gerentes.",after:"A ideia é reduzir ao máximo o trabalho extra dos gerentes. Os eixos de execução passam a ser calculados automaticamente à medida que o acompanhamento das entregas migra para o CITi Flow, como proposto pela Diretoria de Soluções.",src:"Proposta; proposta da Diretoria de Soluções 2027.",open:"Dinâmica de preenchimento: quem registra cada eixo, a partir de qual fonte de informação e qual o papel do gerente."},
+     {id:"l-painel",origin:"novo",title:"Painel da carteira e forecast da base",summary:"A saúde de todos os projetos vigentes visível em um só lugar, combinada às oportunidades de cada conta para projetar a receita da base.",before:"Não há uma forma de visualizar, de modo unificado, todos os projetos vigentes e sua saúde; a visão depende de repasses dos gerentes. O forecast existente é só do funil comercial de novos clientes.",after:"No pipe de CS, todos os projetos vigentes aparecem com a saúde da conta. CS acompanha a carteira por exceção, e a diretoria e as lideranças passam a ter um forecast da base, nos moldes do forecast de Comercial.",visual:"forecast",details:["Inspiração: o forecast de Comercial no CITi Flow pondera cada oportunidade pela probabilidade da etapa (Qualificação 10%, Diagnóstico 25%, Proposta 50%, Negociação 75%) e mostra composição, mês previsto e responsável.","No forecast da base, a probabilidade combina a etapa da oportunidade com a saúde da conta: uma oportunidade em conta vermelha não entra na previsão."],src:"Proposta; CITi Flow (aba Forecast de Comercial).",open:"Validar com Inovação e Negócios as etapas e as probabilidades do forecast da base."}
+    ]},
+   {id:"p2s2",kind:"Subpilar 2.2",title:"Voz do cliente em ciclo fechado",
+    summary:"Fazer com que o que o cliente diz chegue a quem pode agir sobre ele, registrando os feedbacks ao longo de toda a jornada, tratando cada um conforme a sua natureza e transformando os elogios ao time em reconhecimento.",
+    before:"CS já mostrou que a voz do cliente muda a operação: foi a partir de um feedback que Soluções passou a validar as entregas desde o início. Mas os feedbacks ainda chegam aos times de forma informal, sem registro que sobreviva à troca de gestão. Os elogios a membros e squads chegam ao time, mas de forma informal, sem um registro que os conecte ao reconhecimento.",
+    after:"Um processo que registra o que o cliente diz em um lugar único, trata cada feedback conforme a sua natureza e transforma os elogios em reconhecimento.",
+    result:"A operação de Soluções passa a melhorar a partir do que o cliente percebe e valoriza, os times recebem retorno concreto sobre o próprio trabalho e quem gera satisfação é reconhecido. Cada cliente melhora a experiência dos próximos.",
+    children:[
+     {id:"l-coleta",origin:"existe",title:"Coleta ao longo da jornada",summary:"Perguntas por marco, contatos de CS, reuniões com o gerente e formulários de CSAT.",before:"Formulário de satisfação aplicado no fim dos projetos.",after:"Somam-se as perguntas fixas por marco; informações relevantes das reuniões são levadas ao card da conta.",src:"Reunião com a atual gerente de CS (19/10).",open:"Definir se o formulário também se mantém no meio do projeto."},
+     {id:"l-registro",origin:"novo",title:"Registro em um lugar único",summary:"Feedbacks, observações e elogios, inclusive a squads e membros, registrados no card da conta, junto com a saúde do projeto.",before:"Repassados em conversas, sem registro que permita retomá-los depois.",after:"O que o cliente disse fica acessível a quem acompanha a conta e é repassado na troca de gestão.",src:"Proposta; depoimento do líder de Desenvolvimento."},
+     {id:"l-tratamento",origin:"novo",title:"Tratamento conforme a natureza",summary:"Cada feedback segue um caminho diferente, conforme de onde nasce e quem pode agir sobre ele.",before:"Cada feedback é tratado conforme a iniciativa de quem o recebe.",after:"Três naturezas, três caminhos, e o aprendizado sempre registrado no playbook de CS, no módulo correspondente.",visual:"tratamento",src:"Proposta."},
+     {id:"l-reconhec",origin:"evolui",title:"Elogios que viram reconhecimento",summary:"Os elogios registrados chegam ao gerente ao longo do projeto e, ao final, sustentam o reconhecimento do squad e dos membros que se destacaram.",before:"Os elogios dos clientes já chegam aos gerentes e aos times, repassados por CS em conversas. O Framework de 2026 previa também usá-los como base de reconhecimento, prática que ainda pode ganhar muito com um registro estruturado.",after:"Conexão com as metas coletivas propostas pela Diretoria de Soluções para 2027, que já usam “valor para o cliente” como um dos critérios de avaliação e reconhecimento.",visual:"metas",src:"Framework 2026; proposta da Diretoria de Soluções 2027 (Cultura e formação: metas coletivas e reconhecimentos orientados a resultado)."}
+    ]}
+  ]},
+ {id:"p3",color:"p3",kind:"Pilar 3",title:"Alavanca de Negócios",
+  summary:"Transformar o resultado gerado no negócio de cada cliente em continuidade para o CITi, comprovando o valor entregue e convertendo clientes bem-sucedidos em recompra, expansão e indicação, para que a base se torne uma fonte de receita e tenhamos uma máquina de vendas mais sustentável.",
+  children:[
+   {id:"p3s1",kind:"Subpilar 3.1",title:"Resultado comprovado",
+    summary:"Transformar o resultado gerado no negócio do cliente em prova concreta de valor, acompanhando os indicadores combinados no Discovery até a implementação assistida e tornando esse resultado visível ao próprio cliente ao longo de todo o projeto.",
+    before:"O CITi ainda mede o sucesso pela entrega, e não pelo resultado. O cliente não acompanha a evolução dos critérios de sucesso, nenhum projeto chegou a comparar o business case com o cenário depois da entrega e ainda não existe uma base de cases do novo modelo de negócios. A Ficha de Resultado e a implementação assistida criam os momentos para medir, mas falta quem acompanhe.",
+    after:"Acompanhamento contínuo dos indicadores, do Discovery à implementação assistida, que torna o valor visível e vira prova para o cliente, para Negócios e para o mercado.",
+    result:"Projetos medidos pelo resultado no negócio do cliente. O cliente vê, ao vivo, o valor gerado; Negócios ganha provas e cases com números; Produto ganha dados reais para calibrar os próximos business cases.",
+    children:[
+     {id:"l-ficha",origin:"diretoria",title:"Indicadores definidos no Discovery",summary:"CS participa da construção da Ficha de Resultado com Produto e o analista de Negócios.",before:"Critérios de sucesso majoritariamente qualitativos.",after:"Cada indicador com situação inicial, meta, prazo e fonte do dado, para ser acompanhado no pós-projeto.",details:["Referência: dois a três indicadores por projeto.","Um indicador sem situação inicial não pode ser comprovado depois."],src:"Proposta da Diretoria de Negócios 2027."},
+     {id:"l-dashboard",origin:"evolui",title:"Percepção de valor durante o projeto",summary:"Critérios de sucesso e indicadores visíveis ao cliente no dashboard de acompanhamento, junto ao andamento das entregas.",before:"Dashboard em uso em um projeto; o e-mail de alinhamento previsto em 2026 não chegou a ser enviado.",after:"O dashboard cumpre de forma contínua o papel do e-mail de alinhamento. Os indicadores também orientam as perguntas de valor de CS e as reuniões com o decisor.",src:"Reunião com a atual gerente de CS (31/10); roteiros ESTAF e Visus; proposta da Diretoria de Soluções 2027."},
+     {id:"l-impl",origin:"diretoria",title:"Implementação assistida",summary:"Depois da entrega, CS e gerente conduzem juntos a implementação assistida.",before:"Não havia acompanhamento estruturado depois da entrega.",after:"O gerente garante o domínio técnico e trata os ajustes de uso da solução; CS acompanha uso, adoção e avanço dos indicadores. Novas necessidades que surgirem vão ao mapa de oportunidades da conta.",details:["Referência de acompanhamento: 30 dias (a solução entrou na rotina?), 60 dias (o uso é recorrente?), 90 dias (medição consolidada, antes e depois).","Sempre que possível, CS vê a solução em uso no próprio cliente."],src:"Proposta da Diretoria de Negócios 2027; reunião com a atual gerente de CS (25/10)."},
+     {id:"l-revisao",origin:"diretoria",title:"Revisão de Valor",summary:"Ao fim da implementação, CS consolida um relatório de valor que sustenta a Revisão Executiva de Valor com o analista titular de Negócios.",before:"Revisões com o decisor previstas em 2026, ainda sem projetos encerrados para acontecerem.",after:"Relatório com os números de antes e depois, o nível de uso e a percepção do cliente.",src:"Proposta da Diretoria de Negócios 2027; Framework 2026."},
+     {id:"l-cases",origin:"novo",title:"Resultado que vira case",summary:"Com a autorização do cliente, o relatório vira case para Negócios e compõe um banco de cases do CITi.",before:"Ainda não há cases com resultados do novo modelo de negócios.",after:"Os resultados também retornam a Produto para calibrar os próximos business cases. Primeiro ciclo completo: Acreditar.",src:"Proposta."}
+    ]},
+   {id:"p3s2",kind:"Subpilar 3.2",title:"Expansão e indicação",
+    summary:"Transformar a base de clientes em uma fonte mais previsível de receita, consolidando em um só lugar as oportunidades identificadas ao longo da jornada e entregando-as qualificadas a Negócios no momento em que o cliente já reconhece o valor da entrega, além de definir o momento certo para pedir indicações.",
+    before:"A base de clientes é o ativo mais desperdiçado do CITi: a prospecção ativa converte cerca de 1%, as indicações cerca de 40%, e em 2026 os clientes antigos responderam por menos de 2% do faturamento. As oportunidades dependem da iniciativa de cada um e não ficam registradas, e não existe um momento definido para pedir indicação.",
+    after:"Um processo que reúne as oportunidades de cada conta, qualifica-as antes de chegarem a Negócios e define o momento certo para propor recompra, expansão ou pedir indicação.",
+    result:"Uma base de clientes que deixa de ser histórico e passa a ser fonte de receita. Negócios recebe oportunidades qualificadas e indicações pedidas no momento certo, reduzindo a dependência da prospecção ativa.",
+    children:[
+     {id:"l-mapa",origin:"novo",title:"Mapa de oportunidades por conta",summary:"Reúne três fontes hoje espalhadas.",before:"Oportunidades dependem da iniciativa de cada gerente e não ficam registradas.",after:"Um mapa por conta no CITi Flow.",details:["Dores fora do escopo registradas na venda.","Ideias de expansão levantadas pelos squads (planos de expansão propostos pela Diretoria de Soluções).","Observações de CS ao longo da jornada."],src:"Proposta; proposta da Diretoria de Soluções 2027."},
+     {id:"l-entrega",origin:"novo",title:"Entrega a Negócios",summary:"A oportunidade qualificada entra no funil de Comercial com origem registrada como base.",before:"Não se mede quanto da receita vem dos clientes atuais.",after:"O analista de Negócios conduz a proposta e a negociação, e CS acompanha o desfecho. As oportunidades da base passam a compor o forecast da base.",src:"Proposta."},
+     {id:"l-continuidade",origin:"novo",title:"Continuidade",summary:"Conversas de continuidade em momentos definidos da jornada, incluindo Synergy e retainer.",before:"A continuidade dependia de o cliente manifestar interesse; a transição do Discovery para o Delivery já é conduzida comercialmente.",after:"Momentos definidos e, no Synergy, revisão trimestral da conta.",details:["Fim do Discovery: evolução para o Delivery.","Pré-encerramento do Delivery: momento em que os squads apresentam as ideias de expansão.","Depois da implementação assistida: na Revisão de Valor.","Synergy: revisão trimestral sustenta a renovação e a expansão para novos setores do cliente.","Retainer: CS junto com o gerente do projeto identifica se a conta tem perfil (ex.: Acreditar, Tera)."],src:"Proposta; depoimentos do gerente de Dados (ARA) e do líder de Desenvolvimento; proposta da Diretoria de Soluções 2027."},
+     {id:"l-overdelivery",origin:"diretoria",title:"Curadoria do overdelivery",summary:"As ideias de overdelivery partem da escuta dos squads e passam pela curadoria de CS antes de chegar ao cliente.",before:"Ideias de overdelivery surgem de iniciativas isoladas, muitas vezes sugeridas pela própria gerente de CS em conversa com os gerentes.",after:"Curadoria proposta pela Diretoria de Soluções para o Gerente de CS. CS avalia cada ideia com base no que está registrado na conta (voz do cliente, saúde e indicadores) e prioriza as que fortalecem a relação em contas com potencial de continuidade.",details:["Gestos de hospitalidade, de baixo custo, em todos os projetos (ex.: comunicação personalizada, encerramento cuidadoso).","Overdelivery técnico com reserva de até 5% das horas estimadas, em piloto, sem aumentar preço nem prazo.","Três critérios da Diretoria de Soluções: estar ligado ao contexto do cliente; gerar um benefício que ele perceba; não criar expectativa de escopo recorrente."],src:"Proposta da Diretoria de Soluções 2027 (Sucesso e Experiência do Cliente); depoimentos dos gerentes de Desenvolvimento."},
+     {id:"l-indicacao",origin:"evolui",title:"Indicação no momento certo",summary:"O pedido de indicação a clientes promotores no encerramento é mantido e ganha critério.",before:"O Framework de 2026 previa pedir indicação a promotores no encerramento, a partir da nota de satisfação.",after:"Como CS acompanha a saúde e os indicadores, é CS quem sinaliza o momento mais forte para o pedido, que passa a acontecer também depois da implementação assistida. Clientes dispostos a dar depoimento ou participar de cases são encaminhados a Negócios.",src:"Framework 2026; proposta da Diretoria de Negócios 2027."}
+    ]}
+  ]},
+ {id:"p4",color:"p4",kind:"Interfaces",title:"CS com as subáreas",
+  summary:"Como CS se conecta a cada subárea do CITi na visão da proposta, a partir da análise crítica entregue em 21/10.",
+  children:[
+   {id:"i-neg",kind:"Negócios",title:"Comercial e Marketing",summary:"Passagem de bastão desde a venda e devolutiva de contas maduras para recompra, fidelização e indicação; com Marketing, conteúdos por etapa da jornada e cases a partir de clientes satisfeitos.",
+    children:[
+     {id:"i-com",origin:"novo",title:"Comercial",summary:"Passagem de bastão bem estruturada e devolutiva em recompra, fidelização e indicações.",before:"Relação com o cliente termina no último dia do projeto.",after:"CS como ponte entre o CRM e a gestão de projetos.",src:"Análise crítica (21/10)."},
+     {id:"i-mkt",origin:"evolui",title:"Marketing / CX",summary:"Conteúdo por etapa da jornada e cases com resultados comprovados.",before:"Materiais de onboarding feitos por CX, com dependência de repasses.",after:"CX no macro, CS no micro; depoimentos e cases para o mercado.",src:"Análise crítica (21/10)."},
+     {id:"i-inst",origin:"novo",title:"Institucional",summary:"Clientes estratégicos como ativos institucionais; comitê de clientes.",before:"Relacionamentos institucional e comercial registrados separadamente.",after:"Conexões do ecossistema registradas no mesmo lugar que as contas.",src:"Análise crítica (21/10)."}
+    ]},
+   {id:"i-sol",kind:"Soluções",title:"Produto, Desenvolvimento e Dados",summary:"Business case como ponto de partida de CS; validação contínua com o cliente; tradução do avanço que o cliente não enxerga.",
+    children:[
+     {id:"i-prod",origin:"novo",title:"Produto",summary:"O resultado projetado no Discovery é o que CS acompanha e mede depois.",before:"Business case nunca comparado ao resultado real.",after:"Resultado volta a Produto como aprendizado.",src:"Análise crítica (21/10)."},
+     {id:"i-dev",origin:"novo",title:"Desenvolvimento",summary:"Validação do andamento com o cliente, feedbacks que ajustam a operação e elogios que viram reconhecimento.",before:"Validação tardia e reconhecimento escasso.",after:"Problemas aparecem cedo, não no encerramento.",src:"Análise crítica (21/10)."},
+     {id:"i-dados",origin:"novo",title:"Dados",summary:"CS traduz para o cliente o avanço que ele não enxerga (integrações, modelos), para que não sinta o projeto parado.",before:"Clientes já acharam que projetos estavam parados por não verem o avanço do back-end.",after:"Percepção de valor sustentada durante todo o projeto.",src:"Análise crítica (21/10)."}
+    ]},
+   {id:"i-int",kind:"Interno",title:"Inovação e Gente e Gestão",summary:"Inovação constrói com CS o pipe no CITi Flow; GG leva a voz do cliente ao desenvolvimento dos membros.",
+    children:[
+     {id:"i-inov",origin:"novo",title:"Inovação",summary:"CS incorporada ao CITi Flow, cruzando saúde, NPS e vendas; taqCITi como fonte de sinais.",before:"Plataforma de CS isolada e em desuso.",after:"Fonte única de informações sobre cada cliente.",src:"Análise crítica (21/10); Inovação."},
+     {id:"i-gg",origin:"novo",title:"Gente e Gestão",summary:"Feedbacks dos clientes sobre o time alimentam o desenvolvimento e o reconhecimento; cultura de foco no cliente desde a formação.",before:"O que o cliente diz sobre o time não chega ao desenvolvimento dos membros.",after:"Olhar para o cliente como comportamento de toda a empresa.",src:"Análise crítica (21/10)."}
+    ]}
+  ]}
+ ]
+};
+
+const VISUALS={
+ tratamento:`<div class="flow">
+  <div class="flow-row"><div class="fbox f-nat"><b>Execução interna</b><span>Ex.: o squad pede ao cliente uma informação que ele já tinha dado; falha de comunicação interna</span></div><div class="farrow">→</div><div class="fbox"><b>CS repassa ao gerente e ao time</b><span>Como aprendizado para a condução do projeto, sem envolver o cliente</span></div><div class="farrow">→</div><div class="fbox f-dest"><b>Playbook · Soluções</b></div></div>
+  <div class="flow-row"><div class="fbox f-nat"><b>Exige intervenção com o cliente</b><span>Ex.: algo na entrega ou na experiência que precisa ser corrigido</span></div><div class="farrow">→</div><div class="fbox"><b>CS + gerente definem e executam a ação</b><span>Depois, CS confirma com o cliente se o problema foi resolvido</span></div><div class="farrow">→</div><div class="fbox f-dest"><b>Playbook · CS</b></div></div>
+  <div class="flow-row"><div class="fbox f-nat"><b>Origem na venda</b><span>Ex.: expectativa criada na negociação que não corresponde ao escopo</span></div><div class="farrow">→</div><div class="fbox"><b>Volta ao analista de Negócios</b><span>Responsável pela conta, como aprendizado comercial</span></div><div class="farrow">→</div><div class="fbox f-dest"><b>Playbook · Negócios</b></div></div>
+  <div class="flow-row"><div class="fbox f-nat f-pos"><b>Elogio</b><span>Ao squad ou a um membro</span></div><div class="farrow">→</div><div class="fbox"><b>Registro no card + repasse ao gerente</b><span>Ver “Elogios que viram reconhecimento”</span></div><div class="farrow">→</div><div class="fbox f-dest"><b>Reconheci­mento</b></div></div>
+ </div>`,
+ metas:`<p class="vnote">O que a Diretoria de Soluções propõe (subpilar “Metas coletivas e reconhecimentos orientados a resultado”): um ciclo mensal ligado à Reunião Geral de Soluções (RGS), com metas e reconhecimento guiados por <b>quatro critérios</b>: valor para o cliente, construção de capacidades de longo prazo, inovação aplicada e eficiência operacional.</p>
+ <div class="vsteps">
+  <div class="vstep"><i>1</i><div><b>Antes da RGS</b><span>CTO e líderes definem 3 metas de Soluções para o ciclo, a partir das métricas e da saúde dos projetos (ex.: gerar oportunidades de fidelização).</span></div></div>
+  <div class="vstep"><i>2</i><div><b>Na RGS</b><span>Cada gerente constrói com o squad até 3 metas próprias, conectadas às de Soluções, com prazo, responsável e indicador.</span></div></div>
+  <div class="vstep"><i>3</i><div><b>Fechamento do mês</b><span>Cada pessoa é avaliada por um índice do seu cargo, organizado pelos quatro critérios.</span></div></div>
+  <div class="vstep"><i>4</i><div><b>Na RG</b><span>Reconhecimento de quem mais se destacou nos critérios e dos projetos com melhores resultados.</span></div></div>
+ </div>
+ <div class="vlink"><b>Onde CS se conecta</b><ul><li>Os elogios registrados por CS no card da conta viram evidência no critério <b>valor para o cliente</b> do índice de cada membro e do squad.</li><li>A saúde das contas e as percepções coletadas por CS alimentam a definição das metas de Soluções antes da RGS.</li><li>A entrega dos planos de expansão no prazo também faz parte das metas coletivas e é reconhecida na RG.</li></ul></div>`,
+ forecast:`<p class="vnote">Proposta de régua para o forecast da base, inspirada no forecast de Comercial. Valores ilustrativos, a validar.</p>
+ <div class="fc">
+  <div class="fc-col"><h5>Etapa da oportunidade</h5>
+   <div class="fc-row"><span>Identificada</span><span class="bar"><i style="width:10%"></i></span><b>10%</b></div>
+   <div class="fc-row"><span>Validada com o cliente</span><span class="bar"><i style="width:25%"></i></span><b>25%</b></div>
+   <div class="fc-row"><span>Proposta apresentada</span><span class="bar"><i style="width:50%"></i></span><b>50%</b></div>
+   <div class="fc-row"><span>Negociação</span><span class="bar"><i style="width:75%"></i></span><b>75%</b></div>
+  </div>
+  <div class="fc-x">×</div>
+  <div class="fc-col"><h5>Saúde da conta</h5>
+   <div class="fc-row"><span><i class="dot" style="background:#11805A"></i> Verde</span><b>× 1</b></div>
+   <div class="fc-row"><span><i class="dot" style="background:#A65F00"></i> Amarelo</span><b>× 0,5</b></div>
+   <div class="fc-row"><span><i class="dot" style="background:#B42318"></i> Vermelho</span><b>fora</b></div>
+  </div>
+ </div>
+ <p class="vnote">Visões no painel, como em Comercial: composição (comprometido, provável, em risco), por mês previsto, por tipo de oportunidade (recompra, expansão, retainer, renovação de Synergy) e por conta.</p>`
+};
+
+/* index */
+const ALL={},PARENT={},ORDER=[];
+(function walk(n,p,pillar){ALL[n.id]=n;if(p)PARENT[n.id]=p.id;n.pillar=pillar||n.color;ORDER.push(n.id);(n.children||[]).forEach(c=>walk(c,n,n.color||pillar));})(DATA,null,null);
+const LEAVES=Object.values(ALL).filter(n=>n.origin);
+
+/* summary */
+const counts={existe:0,evolui:0,diretoria:0,novo:0};LEAVES.filter(l=>l.pillar!=="p4").forEach(l=>counts[l.origin]++);
+document.getElementById("summary").innerHTML=Object.keys(ORIG).map(k=>`<div class="sumcard"><span class="row" style="gap:7px"><i class="dot d-${k}"></i>${ORIG[k].label}</span><b>${counts[k]}</b><span>${ORIG[k].desc}</span></div>`).join("");
+
+/* filters */
+let active=null;
+const fEl=document.getElementById("filters");
+fEl.innerHTML=Object.keys(ORIG).map(k=>`<button class="chip" data-o="${k}" aria-pressed="false"><i class="dot d-${k}"></i>${ORIG[k].label} <span class="count">${counts[k]}</span></button>`).join("");
+fEl.addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;const o=b.dataset.o;active=active===o?null:o;
+ fEl.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.o===active)));
+ const tree=document.getElementById("mapInner");tree.classList.toggle("filtering",!!active);
+ document.querySelectorAll(".n-leaf").forEach(n=>n.classList.toggle("match",ALL[n.dataset.id].origin===active));});
+
+/* render tree */
+const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function nodeBtn(n,cls){
+ const col=PCOLOR[n.pillar]||"var(--ink)";
+ if(cls==="n-leaf")return `<button class="node n-leaf" data-id="${n.id}" style="border-left:3px solid var(--o-${n.origin})"><i class="dot d-${n.origin}"></i><span class="t">${esc(n.title)}</span>${n.open?'<span class="open">em aberto</span>':''}</button>`;
+ const style=cls==="n-pillar"?`border-color:${col}`:cls==="n-sub"?`border-left:4px solid ${col}`:"";
+ return `<button class="node ${cls}" data-id="${n.id}" style="${style}"><span class="k" ${cls==="n-pillar"?`style="color:${col}"`:""}>${esc(n.kind)}</span><span class="t">${esc(n.title)}</span>${n.sub?`<span class="s">${esc(n.sub)}</span>`:""}</button>`;
+}
+const tree=document.getElementById("tree");
+tree.innerHTML=`<div class="root">${nodeBtn(DATA,"n-root")}</div><div class="branches">${DATA.children.map(p=>`
+ <div class="branch"><div>${nodeBtn(p,"n-pillar")}</div><div class="subs">${p.children.map(s=>`
+  <div class="sub"><div>${nodeBtn(s,"n-sub")}</div><div class="leaves">${(s.children||[]).map(l=>nodeBtn(l,"n-leaf")).join("")}</div></div>`).join("")}</div></div>`).join("")}</div>`;
+
+/* connectors */
+const svg=document.getElementById("links"),inner=document.getElementById("mapInner");
+function drawLinks(){
+ if(innerWidth<=760){svg.innerHTML="";return;}
+ const ib=inner.getBoundingClientRect();svg.setAttribute("viewBox",`0 0 ${ib.width} ${ib.height}`);
+ let out="";
+ Object.keys(PARENT).forEach(id=>{
+  const a=inner.querySelector(`[data-id="${PARENT[id]}"]`),b=inner.querySelector(`[data-id="${id}"]`);if(!a||!b)return;
+  const ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();
+  const x1=ra.right-ib.left,y1=ra.top+ra.height/2-ib.top,x2=rb.left-ib.left,y2=rb.top+rb.height/2-ib.top,mx=(x1+x2)/2;
+  const col=ALL[id].origin?`var(--o-${ALL[id].origin})`:(PCOLOR[ALL[id].pillar]||"var(--muted)");
+  out+=`<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" stroke="${col}"/>`;
+ });
+ svg.innerHTML=out;
+}
+new ResizeObserver(drawLinks).observe(inner);addEventListener("resize",drawLinks);document.fonts&&document.fonts.ready.then(drawLinks);
+
+/* panel */
+const panel=document.getElementById("panel"),body=document.getElementById("panelBody");
+let current="root";
+function crumbs(id){const c=[];let p=PARENT[id];while(p){c.unshift(ALL[p]);p=PARENT[p];}return c;}
+function show(id,openSheet){
+ current=id;const n=ALL[id];
+ document.querySelectorAll(".node.selected").forEach(x=>x.classList.remove("selected"));
+ const el=inner.querySelector(`[data-id="${id}"]`);el&&el.classList.add("selected");
+ const cr=crumbs(id);
+ const tags=[];
+ if(n.origin)tags.push(`<span class="tag"><i class="dot d-${n.origin}"></i>${ORIG[n.origin].label}</span>`);
+ if(n.kind&&!n.origin)tags.push(`<span class="tag">${esc(n.kind)}</span>`);
+ cr.forEach(c=>tags.push(`<button class="tag" data-go="${c.id}" style="cursor:pointer">${esc(c.title)}</button>`));
+ const idx=ORDER.indexOf(id),prev=ORDER[idx-1],next=ORDER[idx+1];
+ body.innerHTML=`
+  <div class="p-tags">${tags.join("")}</div>
+  <div><h2 class="p-title">${esc(n.title)}</h2>${n.sub?`<p class="p-sum">${esc(n.sub)}</p>`:""}</div>
+  ${n.summary?`<div class="p-sec"><h4>${n.origin?"O que é":n.kind&&n.kind.startsWith("Pilar")?"Objetivo":"O que é"}</h4><p>${esc(n.summary)}</p></div>`:""}
+  ${n.before?`<div class="p-sec p-before"><h4>${n.origin?"Hoje / 2026":"Por que"}</h4><p>${esc(n.before)}</p></div>`:""}
+  ${n.after?`<div class="p-sec p-after"><h4>${n.origin?"Na proposta":"Para onde vai"}</h4><p>${esc(n.after)}</p></div>`:""}
+  ${n.details?`<div class="p-sec"><h4>Em detalhe</h4><ul class="p-details">${n.details.map(d=>`<li>${esc(d)}</li>`).join("")}</ul></div>`:""}
+  ${n.visual?`<div class="p-sec"><h4>Visualização</h4>${VISUALS[n.visual]}</div>`:""}
+  ${n.result?`<div class="p-sec"><h4>Resultado esperado</h4><p>${esc(n.result)}</p></div>`:""}
+  ${n.open?`<div class="p-open p-sec"><h4>Em aberto</h4><p>${esc(n.open)}</p></div>`:""}
+  ${n.children?`<div class="p-sec"><h4>Ramos</h4><div class="p-kids">${n.children.map(c=>`<button data-go="${c.id}">${c.origin?`<i class="dot d-${c.origin}"></i>`:""}${esc(c.title)}</button>`).join("")}</div></div>`:""}
+  ${n.src?`<p class="p-src">Fonte: ${esc(n.src)}</p>`:""}
+  <div class="p-nav"><button data-go="${prev||""}" ${prev?"":"disabled"}>← ${prev?esc(ALL[prev].title):""}</button><button data-go="${next||""}" ${next?"":"disabled"}>${next?esc(ALL[next].title):""} →</button></div>`;
+ if(openSheet)panel.classList.add("show");
+}
+inner.addEventListener("click",e=>{const b=e.target.closest(".node");if(b)show(b.dataset.id,true);});
+body.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b&&b.dataset.go){show(b.dataset.go,true);const el=inner.querySelector(`[data-id="${b.dataset.go}"]`);el&&el.scrollIntoView({block:"nearest",inline:"nearest",behavior:"smooth"});}});
+document.getElementById("panelClose").addEventListener("click",()=>panel.classList.remove("show"));
+addEventListener("keydown",e=>{if(e.key==="Escape")panel.classList.remove("show");});
+show("root",false);
+</script>
+</body>
+</html>

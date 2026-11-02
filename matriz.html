@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Matriz de Papéis · CS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0F0D15;--surface:#15131C;--surface-2:#1D1A27;--line:#2C2838;--grid:#24202F;
+  --ink:#ECE8F5;--ink-2:#B4AECA;--muted:#857F9C;
+  --accent:#3DE8FF;--accent-2:#8B7BFF;
+  --r-neg:#C97A12;--r-cs:#1E9EB0;--r-ger:#D2557E;--r-cx:#8170E6;--r-prod:#7A9A2E;
+  --l-R:#ECE8F5;--l-E:#9A94B5;--l-C:#5A5470;--l-I:#35303F;
+  --f:"Sora",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:14px;line-height:1.5;padding:24px 16px 56px}
+.wrap{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+button{font:inherit;color:inherit}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.head{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end}
+.head h1{font-size:clamp(24px,3.2vw,34px)}
+.head h1 span{color:var(--accent)}
+.sub{color:var(--ink-2);max-width:76ch;margin-top:6px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink-2);background:var(--surface)}
+.badge.hl{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card h2{font-size:16px}
+.hint{color:var(--muted);font-size:12.5px;margin-top:2px}
+.grid{display:grid;gap:18px}
+.g-kpi{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:0;overflow:hidden}
+.kpi{padding:16px 18px;border-right:1px solid var(--line);display:flex;align-items:center;gap:14px;min-width:0}
+.kpi:last-child{border-right:0}
+.kpi b{font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.kpi .l{font-size:12.5px;color:var(--ink-2)}
+.kpi .s{font-size:11.5px;color:var(--muted)}
+.kpi .tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.g-2{grid-template-columns:1.15fr 1fr}
+.sw{width:9px;height:9px;border-radius:3px;display:inline-block;flex:none}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink-2);margin-top:12px;align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+
+/* swimlane */
+.lane-wrap{overflow-x:auto;margin-top:12px;-webkit-overflow-scrolling:touch}
+.lane-wrap svg{display:block;min-width:900px}
+svg text{font-family:var(--mono);fill:var(--muted);font-size:11px}
+.stage-hit{cursor:pointer}
+.stage-hit:hover rect{fill:color-mix(in srgb,var(--accent) 6%,transparent)}
+.hand{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.hand div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--ink-2);display:flex;gap:10px}
+.hand i{font-style:normal;flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#06222A;font-family:var(--mono);font-size:11px;font-weight:600}
+.hand b{display:block;color:var(--ink);font-size:13px;margin-bottom:2px}
+
+/* raci pills */
+.lv{display:inline-grid;place-items:center;min-width:30px;height:22px;padding:0 6px;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em}
+.lv-R{background:var(--l-R);color:#15131C}
+.lv-E{background:var(--l-E);color:#15131C}
+.lv-ER{background:linear-gradient(90deg,var(--l-E) 50%,var(--l-R) 50%);color:#15131C}
+.lv-C{background:transparent;border:1.5px solid var(--l-E);color:var(--ink-2)}
+.lv-I{background:var(--l-I);color:var(--muted)}
+
+/* bars */
+.sb{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.sb-row{display:grid;grid-template-columns:170px minmax(0,1fr) 46px;gap:10px;align-items:center;font-size:12.5px}
+.sb-row .nm{display:flex;align-items:center;gap:8px;color:var(--ink-2)}
+.sb-track{display:flex;gap:2px;height:16px}
+.sb-track span{height:100%;display:block}
+.sb-track span:first-child{border-radius:4px 0 0 4px}
+.sb-track span:last-child{border-radius:0 4px 4px 0}
+.sb-row .v{font-family:var(--mono);font-size:11.5px;text-align:right;color:var(--ink-2)}
+
+/* table */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;color:var(--ink-2)}
+.chip:hover{border-color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sep{width:1px;height:20px;background:var(--line);margin:0 4px}
+.tbl{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap}
+th.rc,td.rc{text-align:center;width:118px}
+th.rc span{display:inline-flex;align-items:center;gap:6px}
+tr.stg td{background:var(--surface-2);font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);padding:7px 10px}
+tr.act{cursor:pointer}
+tr.act:hover td{background:color-mix(in srgb,var(--ink) 3%,transparent)}
+tr.act td:first-child{font-weight:500}
+tr.act .tags{display:inline-flex;gap:5px;margin-left:8px;vertical-align:middle}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:1px 7px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.tag.new{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));color:var(--accent)}
+.tag.int{border-color:color-mix(in srgb,var(--accent-2) 60%,var(--line));color:#B5AAFF}
+.tag.val{border-style:dashed}
+.chev{color:var(--muted);font-family:var(--mono);margin-right:6px;display:inline-block;transition:transform .15s}
+tr.act.open .chev{transform:rotate(90deg)}
+tr.det td{background:color-mix(in srgb,var(--accent) 3%,var(--surface));padding:12px 14px 14px}
+.det-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.det-grid div{border-left:3px solid var(--line);padding:4px 10px;font-size:12.5px;color:var(--ink-2)}
+.det-grid b{display:flex;align-items:center;gap:6px;color:var(--ink);font-size:12.5px;margin-bottom:2px}
+.colhl{background:color-mix(in srgb,var(--accent) 7%,transparent)!important}
+tr.dim{opacity:.28}
+
+/* method */
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:16px;position:relative}
+.steps::before{content:"";position:absolute;left:22px;right:22px;top:21px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2));opacity:.55}
+.step{position:relative;display:flex;flex-direction:column;gap:8px}
+.step .n{width:44px;height:44px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);display:grid;place-items:center;font-family:var(--mono);font-weight:600;color:var(--accent);box-shadow:0 0 14px color-mix(in srgb,var(--accent) 35%,transparent);z-index:1}
+.step .bx{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.step .when{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.step h3{font-size:14px}
+.step p{font-size:12.5px;color:var(--ink-2)}
+.step .out{font-size:11.5px;color:var(--accent);border-top:1px dashed var(--line);padding-top:6px;margin-top:auto}
+.who{display:flex;flex-wrap:wrap;gap:4px}
+.who span{font-size:10.5px;border-radius:999px;padding:1px 7px;background:var(--surface);border:1px solid var(--line);color:var(--ink-2)}
+
+.contrib{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+.contrib div{background:var(--surface-2);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:12px;padding:12px;font-size:12.5px;color:var(--ink-2)}
+.contrib b{display:block;color:var(--ink);font-size:13px;margin-bottom:4px}
+.vars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.var{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.var b{font-size:13px}
+.var p{font-size:12.5px;color:var(--ink-2)}
+.var .opts{display:flex;flex-wrap:wrap;gap:4px}
+.var .opts span{font-family:var(--mono);font-size:10.5px;border-radius:6px;padding:2px 7px;background:var(--surface-2);color:var(--ink-2)}
+
+.tip{position:fixed;pointer-events:none;background:#F4F1FA;color:#15131C;border-radius:10px;padding:8px 10px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .1s;z-index:30;max-width:280px}
+.tip b{display:block;font-size:12.5px;margin-bottom:3px}
+.tip .r{display:flex;justify-content:space-between;gap:12px;font-size:11.5px}
+.tip .r span:last-child{font-family:var(--mono)}
+.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:1100px){.g-2{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.steps::before{display:none}.contrib{grid-template-columns:1fr 1fr}.vars{grid-template-columns:1fr 1fr}.hand{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.g-kpi{grid-template-columns:1fr 1fr}.kpi{border-right:0;border-bottom:1px solid var(--line)}.steps,.contrib,.vars,.hand{grid-template-columns:1fr}.sb-row{grid-template-columns:120px 1fr 40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div>
+      <div class="eyebrow">Jornada do cliente · Papéis e passagens de bastão</div>
+      <h1>Matriz de <span>Papéis</span></h1>
+      <p class="sub">Quem executa, quem responde, quem contribui e quem é informado em cada etapa da jornada, da venda à continuidade da conta. O foco está nos pontos onde os papéis se cruzam e nas atividades novas de 2027 que ainda não têm dono.</p>
+    </div>
+    <div class="badges"><span class="badge hl">Rascunho de partida</span><span class="badge">Hipóteses a validar com as lideranças</span></div>
+  </header>
+
+  <section class="card grid g-kpi" id="kpis" aria-label="Resumo da matriz"></section>
+
+  <section class="card">
+    <h2>A jornada em raias</h2>
+    <p class="hint">Cada raia é um papel; cada coluna, uma etapa da jornada. O tamanho do ponto mostra o envolvimento na etapa, e as setas numeradas são as passagens de bastão. Clique em uma etapa para ver as atividades dela na matriz.</p>
+    <div class="lane-wrap"><div id="lanes"></div></div>
+    <div class="legend" id="laneLegend"></div>
+    <div class="hand" id="hand"></div>
+  </section>
+
+  <section class="grid g-2">
+    <div class="card">
+      <h2>Envolvimento por papel</h2>
+      <p class="hint">Em quantas das atividades cada papel executa, responde, contribui ou é informado.</p>
+      <div class="sb" id="bars"></div>
+      <div class="legend" id="barLegend"></div>
+    </div>
+    <div class="card">
+      <h2>Por que a matriz é necessária</h2>
+      <p class="hint">Onde os papéis se cruzam é onde o cliente repete o que já contou ou recebe contatos desencontrados.</p>
+      <div id="why" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>A matriz</h2>
+    <p class="hint">Clique em uma atividade para ver o que cada papel faz nela.</p>
+    <div class="filters" id="filters"></div>
+    <div class="tbl"><table id="mx"></table></div>
+    <div class="legend" id="mxLegend"></div>
+  </section>
+
+  <section class="card">
+    <h2>Como a matriz é construída</h2>
+    <p class="hint">A matriz não nasce pronta: parte de hipóteses e é validada com quem vive cada passagem antes de virar regra.</p>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  <section class="card">
+    <h2>O que cada um traz para a construção</h2>
+    <p class="hint">Quem participa da escuta e o que cada conversa precisa responder.</p>
+    <div class="contrib" id="contrib"></div>
+  </section>
+
+  <section class="card">
+    <h2>O que faz a matriz variar</h2>
+    <p class="hint">A estrutura é a mesma, mas a intensidade e alguns donos mudam conforme estas variáveis.</p>
+    <div class="vars" id="vars"></div>
+  </section>
+
+  <p class="foot">Protótipo de visualização da proposta para a Gerência de Customer Success. As atribuições são o rascunho de partida e serão validadas com gerentes, analistas de Negócios, CX, CTO e CRO.</p>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+const ROLES=[
+ {k:"neg",l:"Analista de Negócios",s:"titular da conta",c:"var(--r-neg)"},
+ {k:"cs",l:"Customer Success",s:"a ponte",c:"var(--r-cs)"},
+ {k:"gp",l:"Gerente de Produto",s:"Discovery",c:"var(--r-ger)"},
+ {k:"gd",l:"Gerente de Dev/Dados",s:"Delivery",c:"var(--r-prod)"},
+ {k:"cx",l:"CX",s:"padrão de experiência",c:"var(--r-cx)"}
+];
+const STAGES=[
+ {k:1,l:"Venda e passagem",s:"CRM → CS e gerente"},
+ {k:2,l:"Onboarding",s:"reunião de sucesso"},
+ {k:3,l:"Projeto em andamento",s:"marcos e saúde"},
+ {k:4,l:"Discovery → Delivery",s:"troca de gerente"},
+ {k:5,l:"Encerramento",s:"entrega e materiais"},
+ {k:6,l:"Implementação assistida",s:"uso e adoção"},
+ {k:7,l:"Valor e continuidade",s:"revisão e expansão"}
+];
+const LV={ER:"Executa e responde",R:"Responde",E:"Executa",C:"Contribui",I:"É informado"};
+const FASE="O gerente da fase em curso: Produto no Discovery, Dev ou Dados no Delivery.";
+const ACTS=[
+ {st:1,n:"Registrar a venda e as dores fora do escopo",r:{neg:"ER",cs:"I",gp:"I"},novo:1,
+  d:{neg:"Registra no CRM o histórico da venda, o que o cliente espera e as dores que ficaram fora do escopo.",cs:"Recebe o card no pipe de CS, criado automaticamente com esse histórico.",gp:"Acessa o mesmo histórico para planejar o Discovery com o time."}},
+ {st:1,n:"Passagem dupla da venda: para CS e para o gerente de Produto",r:{neg:"R",cs:"E",gp:"E"},
+  d:{neg:"Responde pela passagem: apresenta o contexto, os combinados com o decisor e o que ficou em aberto aos dois ao mesmo tempo.",cs:"Recebe o contexto da relação: expectativas, critérios de sucesso e dores fora do escopo.",gp:"Recebe o contexto da entrega e o leva aos operacionais de produto do Discovery."}},
+ {st:2,n:"Onboarding e reunião de sucesso",r:{cs:"ER",gp:"E",neg:"C",cx:"C"},
+  d:{cs:"Conduz a reunião de sucesso: o que é sucesso, o que é inegociável e a frequência de contato. Registra o documento na conta.",gp:"É apresentado ao cliente junto com CS e apresenta o time, o cronograma e as entregas do Discovery.",neg:"Garante coerência com o que foi vendido.",cx:"Fornece o material base do onboarding."}},
+ {st:2,n:"Ficha de Resultado",r:{gp:"E",neg:"R",cs:"C"},novo:1,val:1,
+  d:{gp:"Com o time de produto, define os indicadores com situação inicial, meta, prazo e fonte do dado.",neg:"Responde pela ficha, proposta pela Diretoria de Negócios.",cs:"Garante que cada indicador possa ser acompanhado depois da entrega."}},
+ {st:2,n:"Definir as entregas-chave do projeto",r:{gp:"ER",gd:"C",cs:"C"},novo:1,
+  d:{gp:"Define as três entregas principais do Discovery a partir do cronograma.",gd:"Define as entregas-chave do Delivery quando assume o projeto.",cs:"Encaixa as perguntas fixas nesses marcos."}},
+ {st:3,n:"Condução das entregas e dia a dia",r:{gp:"ER",gd:"ER",cs:"I",neg:"I"},
+  d:{gp:"Conduz o time de produto e a relação operacional com o cliente no Discovery.",gd:"Conduz o time de dev ou dados e a relação operacional com o cliente no Delivery.",cs:"Acompanha pelo cronograma e pelas reuniões.",neg:"Acompanha a conta da qual é titular."}},
+ {st:3,n:"Perguntas fixas por marco",r:{cs:"ER",gp:"C",gd:"C"},novo:1,
+  d:{cs:"Faz as três perguntas: valor percebido, preocupações com o andamento e confiança no resultado.",gp:FASE+" Abre espaço na reunião que já tem com o cliente.",gd:FASE+" Abre espaço na reunião que já tem com o cliente."}},
+ {st:3,n:"Registro da saúde da conta",r:{cs:"ER",gp:"C",gd:"C",neg:"I"},
+  d:{cs:"Registra a saúde no CITi Flow a partir dos próprios contatos com o cliente.",gp:"Complementa com o andamento das entregas do Discovery.",gd:"Complementa com o andamento das entregas do Delivery.",neg:"Acompanha a saúde da conta da qual é titular."}},
+ {st:3,n:"Tratamento de feedbacks",r:{cs:"R",gp:"E",gd:"E",neg:"C"},
+  d:{cs:"Registra, direciona conforme a natureza e confirma o retorno com o cliente.",gp:FASE+" Age sobre o que diz respeito à execução.",gd:FASE+" Age sobre o que diz respeito à execução.",neg:"Recebe o que tem origem na venda."}},
+ {st:3,n:"Recuperação de conta em risco",r:{cs:"R",gp:"E",gd:"E",neg:"C"},
+  d:{cs:"Identifica a causa e coordena a recuperação.",gp:FASE+" Executa os ajustes no projeto.",gd:FASE+" Executa os ajustes no projeto.",neg:"Entra quando a causa está na venda."}},
+ {st:4,n:"Passagem do gerente de Produto para o gerente de Dev ou Dados",r:{gp:"ER",gd:"E",cs:"C"},
+  d:{gp:"Responde pela passagem: entrega o que foi desenhado e validado no Discovery, as decisões tomadas e o que o cliente espera do Delivery.",gd:"Assume o projeto e o time de dev ou dados a partir desse contexto.",cs:"Completa com o histórico da relação: saúde, feedbacks e o que é inegociável para o cliente."}},
+ {st:4,n:"Onboarding da solução com o cliente",r:{cs:"ER",gd:"E",gp:"C",neg:"C"},
+  d:{cs:"Conduz o onboarding da solução: o mesmo rosto para o cliente entre as fases.",gd:"É apresentado ao cliente e apresenta o plano do Delivery.",gp:"Participa da transição para dar continuidade ao que foi desenhado.",neg:"Fecha a venda do Delivery."}},
+ {st:5,n:"Encerramento e materiais de uso",r:{cs:"R",gd:"E",cx:"C"},
+  d:{cs:"Garante que o cliente saia sabendo usar a solução.",gd:"Entrega os guias de uso e técnicos.",cx:"Produz o padrão dos materiais de encerramento."}},
+ {st:5,n:"Curadoria de overdelivery",r:{cs:"ER",gp:"C",gd:"C"},novo:1,
+  d:{cs:"Aplica os três critérios: contexto do cliente, benefício percebido e nenhuma expectativa de escopo recorrente.",gp:"Leva as ideias do squad de produto.",gd:"Leva as ideias do squad de dev ou dados."}},
+ {st:6,n:"Implementação assistida",r:{cs:"ER",gd:"E"},novo:1,
+  d:{cs:"Acompanha o uso, a adoção e o avanço dos indicadores.",gd:"Garante o domínio técnico da solução."}},
+ {st:6,n:"Relatório de valor",r:{cs:"ER",gd:"C",gp:"I"},novo:1,
+  d:{cs:"Consolida os números de antes e depois, o nível de uso e a percepção do cliente.",gd:"Valida os dados técnicos.",gp:"Recebe os resultados para calibrar os próximos business cases."}},
+ {st:7,n:"Revisão Executiva de Valor",r:{neg:"R",cs:"E"},novo:1,val:1,
+  d:{neg:"Conduz a relação com o decisor.",cs:"Apresenta o resultado comprovado. A revisão é feita em conjunto."}},
+ {st:7,n:"Mapa de oportunidades e qualificação",r:{cs:"ER",gp:"C",gd:"C",neg:"I"},novo:1,
+  d:{cs:"Reúne dores fora do escopo, ideias dos squads e sinais de CS, e qualifica antes de entregar.",gp:"Traz o que o time de produto percebeu.",gd:"Traz o que o time de dev ou dados percebeu.",neg:"Recebe a oportunidade no funil com origem “base”."}},
+ {st:7,n:"Proposta de recompra, expansão ou retainer",r:{neg:"ER",cs:"C",gd:"C"},
+  d:{neg:"Conduz a proposta e a negociação.",cs:"Acompanha o desfecho.",gd:"Ajuda a avaliar se a conta tem perfil para retainer."}},
+ {st:7,n:"Pedido de indicação",r:{cs:"R",neg:"E"},val:1,
+  d:{cs:"Sinaliza o momento mais forte para o pedido, a partir da saúde e do valor percebido.",neg:"Faz o pedido e registra a indicação no funil com origem “indicação de cliente · CS”."}},
+ {st:7,n:"Case e depoimento",r:{neg:"ER",cs:"C",cx:"I"},
+  d:{neg:"Transforma o relatório de valor em case, com autorização do cliente.",cs:"Encaminha os clientes dispostos a participar.",cx:"Usa o case como referência de experiência."}}
+];
+// interseção: papéis de funções diferentes atuando juntos (os dois gerentes contam como uma função quando atuam em fases diferentes)
+const fn=k=>(k==="gp"||k==="gd")?"ger":k;
+ACTS.forEach(a=>{const er=new Set(),act=new Set();Object.entries(a.r).forEach(([k,v])=>{if(v!=="I")act.add(fn(k));if(v!=="I"&&v!=="C")er.add(fn(k));});
+ const handoff=a.r.gp&&a.r.gd&&a.st===4&&a.r.gp!=="C";a.inter=er.size>=2||act.size>=3||handoff;});
+const rank={ER:4,R:3,E:2,C:1,I:0.5};
+const tip=document.getElementById("tip");
+function showTip(e,h){tip.innerHTML=h;tip.style.opacity=1;const x=Math.min(e.clientX+14,innerWidth-290),y=Math.max(e.clientY-10-tip.offsetHeight,8);tip.style.left=x+"px";tip.style.top=y+"px";}
+function hideTip(){tip.style.opacity=0;}
+function bindTips(root){root.querySelectorAll("[data-tip]").forEach(el=>{el.addEventListener("mousemove",e=>showTip(e,el.dataset.tip));el.addEventListener("mouseleave",hideTip);});}
+const q=s=>s.replace(/"/g,"&quot;");
+const roleOf=k=>ROLES.find(r=>r.k===k);
+
+/* KPIs */
+const ring=(p,c)=>{const S=48,r=19,C=2*Math.PI*r;return `<svg width="${S}" height="${S}" aria-hidden="true"><circle cx="24" cy="24" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="6"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C*p} ${C}" transform="rotate(-90 24 24)"/></svg>`};
+const N=ACTS.length,nI=ACTS.filter(a=>a.inter).length,nN=ACTS.filter(a=>a.novo).length,nV=ACTS.filter(a=>a.val).length;
+document.getElementById("kpis").innerHTML=[
+ [`<b>${N}</b>`,"Atividades mapeadas",`em ${STAGES.length} etapas da jornada`],
+ [`${ring(nI/N,"var(--accent-2)")}<b>${nI}</b>`,"Pontos de interseção","dois ou mais papéis atuando juntos"],
+ [`${ring(nN/N,"var(--accent)")}<b>${nN}</b>`,"Novas em 2027","atividades que hoje não têm dono"],
+ [`<b>${nV}</b>`,"A validar com as lideranças","dono ainda em discussão"]
+].map(k=>`<div class="kpi">${k[0]}<div class="tx"><span class="l">${k[1]}</span><span class="s">${k[2]}</span></div></div>`).join("");
+
+/* swimlane */
+let stageFilter=null;
+function lanes(){
+ const W=1240,H=470,top=70,left=190,right=20,lh=(H-top-30)/ROLES.length,cw=(W-left-right)/STAGES.length;
+ const X=i=>left+cw*i+cw/2, Y=j=>top+lh*j+lh/2;
+ let g=`<defs><filter id="glow" x="-10%" y="-200%" width="120%" height="500%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker></defs>`;
+ STAGES.forEach((s,i)=>{const on=stageFilter===s.k;
+  g+=`<g class="stage-hit" data-st="${s.k}"><rect x="${left+cw*i+3}" y="8" width="${cw-6}" height="${H-14}" rx="12" fill="${on?"color-mix(in srgb,var(--accent) 9%,transparent)":"transparent"}" stroke="${on?"color-mix(in srgb,var(--accent) 50%,transparent)":"transparent"}"/>
+   <text x="${X(i)}" y="28" text-anchor="middle" style="fill:var(--ink);font-family:var(--f);font-size:12.5px;font-weight:600">${s.l}</text>
+   <text x="${X(i)}" y="45" text-anchor="middle">${s.s}</text></g>`;});
+ ROLES.forEach((r,j)=>{
+  g+=`<line x1="${left}" x2="${W-right}" y1="${Y(j)}" y2="${Y(j)}" stroke="var(--grid)" stroke-dasharray="${r.k==="cs"?"0":"3 6"}"/>`;
+  g+=`<rect x="10" y="${Y(j)-20}" width="${left-24}" height="40" rx="10" fill="var(--surface-2)" stroke="var(--line)"/><rect x="10" y="${Y(j)-20}" width="4" height="40" rx="2" fill="${r.c}"/>
+   <text x="24" y="${Y(j)-3}" style="fill:var(--ink);font-family:var(--f);font-size:12.5px;font-weight:500">${r.l}</text><text x="24" y="${Y(j)+12}">${r.s}</text>`;});
+ // CS constant line
+ const jcs=ROLES.findIndex(r=>r.k==="cs");
+ g+=`<line x1="${X(0)}" x2="${X(STAGES.length-1)}" y1="${Y(jcs)}" y2="${Y(jcs)}" stroke="var(--accent)" stroke-width="3" opacity=".9"/>`+`<line x1="${X(0)}" x2="${X(STAGES.length-1)}" y1="${Y(jcs)}" y2="${Y(jcs)}" stroke="var(--accent)" stroke-width="10" opacity=".14" stroke-linecap="round"/>`;
+ g+=`<text x="${(X(2)+X(3))/2}" y="${Y(jcs)-30}" text-anchor="middle" style="fill:var(--accent)">um rosto constante para o cliente</text>`;
+ // handoffs
+ const jn=0,jg=ROLES.findIndex(r=>r.k==="gp"),jd=ROLES.findIndex(r=>r.k==="gd");
+ const arrow=(x1,y1,x2,y2,n,lab,bend=0)=>{const mx=(x1+x2)/2+bend,my=(y1+y2)/2;return `<path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ah)"/><g data-tip="${q(lab)}"><circle cx="${mx}" cy="${my}" r="11" fill="var(--accent)"/><text x="${mx}" y="${my+4}" text-anchor="middle" style="fill:#06222A;font-weight:600">${n}</text></g>`};
+ {const x0=X(0)+16,y0=Y(jn)+12,lab="<b>Venda → projeto (passagem dupla)</b>Negócios passa o contexto a CS e ao gerente de Produto ao mesmo tempo; os dois são apresentados ao cliente no onboarding.";
+  g+=`<path d="M${x0},${y0} Q${X(0)+cw*.55},${Y(jn)+20} ${X(1)-16},${Y(jcs)-12}" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ah)"/>`;
+  g+=`<path d="M${x0-6},${y0+4} Q${X(0)+cw*.3},${Y(jg)-10} ${X(1)-18},${Y(jg)-6}" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ah)"/>`;
+  const bx=X(0)+cw*.34,by=(Y(jcs)+Y(jg))/2-6;
+  g+=`<g data-tip="${q(lab)}"><circle cx="${bx}" cy="${by}" r="11" fill="var(--accent)"/><text x="${bx}" y="${by+4}" text-anchor="middle" style="fill:#06222A;font-weight:600">1</text></g>`;}
+ g+=arrow(X(3)+14,Y(jg)+14,X(3)+14,Y(jd)-14,2,"<b>Discovery → Delivery</b>O gerente de Produto passa o projeto ao gerente de Dev ou Dados; CS conduz o onboarding da solução e mantém o mesmo rosto para o cliente.",44);
+ g+=arrow(X(4)+16,Y(jd)-12,X(5)-12,Y(jcs)+16,3,"<b>Entrega → implementação assistida</b>CS assume o acompanhamento do uso e da adoção; o gerente de Dev ou Dados garante o domínio técnico.",0);
+ g+=arrow(X(6)+20,Y(jcs)-16,X(6)+20,Y(jn)+14,4,"<b>Oportunidade → funil de Comercial</b>A oportunidade qualificada volta a Negócios com origem “base”.",30);
+ // nodes
+ STAGES.forEach((s,i)=>ROLES.forEach((r,j)=>{
+  const acts=ACTS.filter(a=>a.st===s.k&&a.r[r.k]);if(!acts.length)return;
+  const best=Math.max(...acts.map(a=>rank[a.r[r.k]]));
+  const rad={4:13,3:12,2:10,1:7,0.5:5}[best];
+  const fill=best>=2?r.c:"var(--surface)";
+  const tipH=`<b>${r.l} · ${s.l}</b>`+acts.map(a=>`<div class="r"><span>${a.n}</span><span>${a.r[r.k]}</span></div>`).join("");
+  g+=`<g data-tip="${q(tipH)}"><circle cx="${X(i)}" cy="${Y(j)}" r="${rad+8}" fill="transparent"/><circle cx="${X(i)}" cy="${Y(j)}" r="${rad}" fill="${fill}" stroke="${best>=2?"var(--surface)":r.c}" stroke-width="2" ${best<1?'opacity=".7"':''}/>${best>=3?`<circle cx="${X(i)}" cy="${Y(j)}" r="${rad+4}" fill="none" stroke="${r.c}" stroke-opacity=".5"/>`:""}</g>`;}));
+ const el=document.getElementById("lanes");
+ el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Jornada em raias por papel e etapa">${g}</svg>`;
+ el.querySelectorAll(".stage-hit").forEach(n=>n.addEventListener("click",()=>{const k=+n.dataset.st;stageFilter=stageFilter===k?null:k;lanes();table();document.getElementById("mx").scrollIntoView({behavior:"smooth",block:"start"});}));
+ bindTips(el);
+}
+document.getElementById("laneLegend").innerHTML=`<span><svg width="30" height="20"><circle cx="10" cy="10" r="8" fill="var(--ink-2)"/><circle cx="10" cy="10" r="10" fill="none" stroke="var(--ink-2)" stroke-opacity=".5"/></svg>Responde por alguma atividade</span><span><svg width="22" height="20"><circle cx="10" cy="10" r="8" fill="var(--ink-2)"/></svg>Executa</span><span><svg width="22" height="20"><circle cx="10" cy="10" r="6" fill="none" stroke="var(--ink-2)" stroke-width="2"/></svg>Contribui ou é informado</span><span><svg width="26" height="20"><line x1="0" x2="26" y1="10" y2="10" stroke="var(--accent)" stroke-width="3"/></svg>Presença contínua de CS</span>`;
+document.getElementById("hand").innerHTML=[
+ ["1","Venda → projeto (dupla)","Negócios passa o contexto a CS e ao gerente de Produto ao mesmo tempo; os dois chegam juntos ao onboarding."],
+ ["2","Discovery → Delivery","O gerente de Produto passa o projeto ao gerente de Dev ou Dados; CS mantém o mesmo rosto para o cliente."],
+ ["3","Entrega → implementação","CS assume o acompanhamento do uso e da adoção junto ao gerente de Dev ou Dados."],
+ ["4","Oportunidade → Comercial","A oportunidade qualificada volta ao funil de Comercial com origem “base”."]
+].map(h=>`<div><i>${h[0]}</i><span><b>${h[1]}</b>${h[2]}</span></div>`).join("");
+
+/* bars */
+const LVC={R:"var(--l-R)",E:"var(--l-E)",C:"var(--l-C)",I:"var(--l-I)"};
+function bars(){
+ const maxN=Math.max(...ROLES.map(r=>ACTS.filter(a=>a.r[r.k]).length));
+ document.getElementById("bars").innerHTML=ROLES.map(r=>{
+  const c={R:0,E:0,C:0,I:0};ACTS.forEach(a=>{const v=a.r[r.k];if(!v)return;if(v==="ER")c.R++;else c[v]++;});
+  const tot=c.R+c.E+c.C+c.I;
+  return `<div class="sb-row"><span class="nm"><i class="sw" style="background:${r.c}"></i>${r.l}</span><span class="sb-track" style="width:${tot/maxN*100}%">${["R","E","C","I"].filter(k=>c[k]).map(k=>`<span style="flex:${c[k]};background:${LVC[k]}" data-tip="${q(`<b>${r.l}</b><div class="r"><span>${k==="R"?"Responde (inclui executa e responde)":LV[k]}</span><span>${c[k]}</span></div>`)}"></span>`).join("")}</span><span class="v">${tot}</span></div>`;}).join("");
+ document.getElementById("barLegend").innerHTML=[["R","Responde"],["E","Executa"],["C","Contribui"],["I","É informado"]].map(([k,l])=>`<span><i class="sw" style="background:${LVC[k]}"></i>${l}</span>`).join("");
+}
+
+/* why */
+document.getElementById("why").innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">${[
+ ["Passagem por conversa","As informações da venda são buscadas em conversas, sem padrão do que precisa ser repassado."],
+ ["Dores que se perdem","As dores relatadas no diagnóstico que ficam fora do escopo não são registradas."],
+ ["Papéis que mudam em 2027","O analista titular de cada conta e a nova estrutura de Soluções exigem redefinir quem fala com o cliente e para quê."],
+ ["Atividades sem dono",`${nN} atividades novas, como a implementação assistida e a Revisão Executiva de Valor, ainda não têm responsável.`]
+].map((w,i)=>`<div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start"><span style="width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent-2) 18%,var(--surface-2));color:#B5AAFF;font-family:var(--mono);font-size:12px">${i+1}</span><div><b style="font-size:13px">${w[0]}</b><p style="font-size:12.5px;color:var(--ink-2)">${w[1]}</p></div></div>`).join("")}</div>`;
+
+/* table */
+let fType="all",fRole=null;const open=new Set();
+const fdefs=[["all","Todas"],["inter","Interseções"],["novo","Novas em 2027"],["val","A validar"]];
+function filters(){
+ document.getElementById("filters").innerHTML=fdefs.map(([k,l])=>`<button class="chip" data-f="${k}" aria-pressed="${fType===k}">${l}</button>`).join("")+`<span class="sep"></span><span class="eyebrow">Destacar papel</span>`+ROLES.map(r=>`<button class="chip" data-r="${r.k}" aria-pressed="${fRole===r.k}"><i class="sw" style="background:${r.c}"></i>${r.l.replace("Analista de ","")}</button>`).join("")+(stageFilter?`<span class="sep"></span><button class="chip" data-clear="1" aria-pressed="true">Etapa: ${STAGES[stageFilter-1].l} ✕</button>`:"");
+}
+document.getElementById("filters").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;
+ if(b.dataset.f)fType=b.dataset.f;if(b.dataset.r)fRole=fRole===b.dataset.r?null:b.dataset.r;if(b.dataset.clear){stageFilter=null;lanes();}table();});
+function pass(a){if(stageFilter&&a.st!==stageFilter)return false;if(fType==="inter")return a.inter;if(fType==="novo")return !!a.novo;if(fType==="val")return !!a.val;return true;}
+function table(){
+ filters();
+ let h=`<thead><tr><th>Atividade</th>${ROLES.map(r=>`<th class="rc ${fRole===r.k?"colhl":""}"><span><i class="sw" style="background:${r.c}"></i>${r.l.replace("Analista de ","")}</span></th>`).join("")}</tr></thead><tbody>`;
+ STAGES.forEach(s=>{const acts=ACTS.map((a,i)=>({...a,i})).filter(a=>a.st===s.k&&pass(a));if(!acts.length)return;
+  h+=`<tr class="stg"><td colspan="${ROLES.length+1}">${s.k} · ${s.l}</td></tr>`;
+  acts.forEach(a=>{const isO=open.has(a.i),dim=fRole&&!a.r[fRole];
+   h+=`<tr class="act ${isO?"open":""} ${dim?"dim":""}" data-i="${a.i}"><td><span class="chev">›</span>${a.n}<span class="tags">${a.inter?'<span class="tag int">interseção</span>':""}${a.novo?'<span class="tag new">nova em 2027</span>':""}${a.val?'<span class="tag val">a validar</span>':""}</span></td>${ROLES.map(r=>`<td class="rc ${fRole===r.k?"colhl":""}">${a.r[r.k]?`<span class="lv lv-${a.r[r.k]}" title="${LV[a.r[r.k]]}">${a.r[r.k]==="ER"?"E·R":a.r[r.k]}</span>`:""}</td>`).join("")}</tr>`;
+   if(isO)h+=`<tr class="det"><td colspan="${ROLES.length+1}"><div class="det-grid">${ROLES.filter(r=>a.d[r.k]).map(r=>`<div style="border-left-color:${r.c}"><b>${r.l}<span class="tag" style="color:var(--ink-2)">${LV[a.r[r.k]]}</span></b>${a.d[r.k]}</div>`).join("")}</div></td></tr>`;});});
+ h+="</tbody>";
+ const t=document.getElementById("mx");t.innerHTML=h;
+ t.querySelectorAll("tr.act").forEach(tr=>tr.addEventListener("click",()=>{const i=+tr.dataset.i;open.has(i)?open.delete(i):open.add(i);table();}));
+}
+document.getElementById("mxLegend").innerHTML=[["ER","E·R","Executa e responde"],["R","R","Responde pelo resultado"],["E","E","Executa"],["C","C","Contribui"],["I","I","É informado"]].map(([k,t,l])=>`<span><span class="lv lv-${k}">${t}</span>${l}</span>`).join("");
+
+/* method */
+document.getElementById("steps").innerHTML=[
+ ["1","Semana 1","Rascunho com hipóteses","CS monta uma primeira versão a partir da jornada, do Framework de 2026 e das mudanças de 2027, marcando as interseções e as atividades sem dono.",["CS"],"Matriz preliminar"],
+ ["2","Semanas 2 e 3","Escuta","Conversas individuais para confrontar o rascunho com a prática de cada papel: onde há atrito, contato duplicado ou informação perdida.",["Gerentes","Analistas","CX","CTO","CRO"],"Ajustes por papel"],
+ ["3","Semana 4","Reunião de fechamento","Encontro conjunto para resolver as interseções em que mais de um papel se vê como dono e fechar a versão de teste.",["Lideranças","CS"],"Matriz validada"],
+ ["4","Mês 2","Simulação em projeto real","A matriz é aplicada a um projeto em andamento, passando por cada etapa para checar se alguma atividade fica sem dono ou duplicada.",["Gerente do projeto","Analista titular","CS"],"Lacunas identificadas"],
+ ["5","Fim do 1º ciclo","Piloto e revisão","A matriz passa a valer para os projetos novos e é revisada com o que aconteceu na prática; depois, a cada fechamento de ciclo.",["Todos os papéis"],"Versão oficial no playbook"]
+].map(s=>`<div class="step"><div class="n">${s[0]}</div><div class="bx"><span class="when">${s[1]}</span><h3>${s[2]}</h3><p>${s[3]}</p><div class="who">${s[4].map(w=>`<span>${w}</span>`).join("")}</div><span class="out">→ ${s[5]}</span></div></div>`).join("");
+
+/* contributions */
+document.getElementById("contrib").innerHTML=[
+ ["var(--r-ger)","Gerentes de Produto, Dev e Dados","Como conduzem hoje a relação com o cliente, como acontece a troca de gerente entre Discovery e Delivery e quais reuniões já existem para encaixar os contatos."],
+ ["var(--r-neg)","Analistas de Negócios","O que se perde na passagem da venda, que informações precisam chegar a CS e como fica a relação com o decisor depois do fechamento."],
+ ["var(--r-cx)","CX","Quais momentos da jornada pedem material padrão e o que CS adapta para cada cliente."],
+ ["var(--accent)","CTO","Como a nova estrutura de Soluções e as metas coletivas mudam quem responde pela entrega e pelo pós-projeto."],
+ ["var(--accent-2)","CRO","O papel do analista titular de cada conta e a divisão com CS na Revisão Executiva de Valor."]
+].map(c=>`<div style="--c:${c[0]}"><b>${c[1]}</b>${c[2]}</div>`).join("");
+
+/* variables */
+document.getElementById("vars").innerHTML=[
+ ["Tipo de projeto","Muda os marcos e quem está à frente. Em um projeto só de Discovery, o encerramento e a continuidade ficam com o gerente de Produto.",["Discovery","Delivery","Synergy"]],
+ ["Saúde da conta","Muda a intensidade: contas em atenção pedem mais proximidade de CS e, em risco, entram em recuperação.",["Saudável","Em atenção","Em risco"]],
+ ["Estrutura de Soluções 2027","Squads e novos cargos podem mudar quem executa a entrega e a implementação assistida.",["Squads","Engenheiros de Soluções"]],
+ ["Titularidade em Negócios","Com um analista titular por conta, a relação comercial tem um dono fixo do início ao fim.",["Analista titular","Decisor do cliente"]]
+].map(v=>`<div class="var"><b>${v[0]}</b><p>${v[1]}</p><div class="opts">${v[2].map(o=>`<span>${o}</span>`).join("")}</div></div>`).join("");
+
+lanes();bars();table();bindTips(document.getElementById("bars"));
+</script>
+</body>
+</html>

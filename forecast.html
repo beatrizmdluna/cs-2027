@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forecast da Base · Sucesso do Cliente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0F0D15;--surface:#15131C;--surface-2:#1D1A27;--line:#2C2838;--grid:#24202F;
+  --ink:#ECE8F5;--ink-2:#B4AECA;--muted:#857F9C;
+  --accent:#3DE8FF;--accent-2:#8B7BFF;
+  --t-recompra:#C97A12;--t-expansao:#1E9EB0;--t-retainer:#D2557E;--t-synergy:#8170E6;
+  --c-1:#7FD3DF;--c-2:#2E9BAA;--c-3:#1D6470;--c-4:#3A3548;
+  --good:#3CB878;--warn:#E0A030;--crit:#E5484D;
+  --f:"Sora",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:14px;line-height:1.5;padding:24px 16px 56px}
+.wrap{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+button{font:inherit;color:inherit}
+.mono{font-family:var(--mono)}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.head{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end}
+.head h1{font-size:clamp(24px,3.2vw,34px)}
+.head h1 span{color:var(--accent)}
+.sub{color:var(--ink-2);max-width:72ch;margin-top:6px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink-2);background:var(--surface)}
+.badge.warn{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));color:var(--accent)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;color:var(--ink-2)}
+.chip:hover{border-color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sw{width:9px;height:9px;border-radius:3px;display:inline-block;flex:none}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card h2{font-size:16px}
+.card .hint{color:var(--muted);font-size:12.5px;margin-top:2px}
+.grid{display:grid;gap:18px}
+.g-kpi{grid-template-columns:repeat(6,minmax(0,1fr));gap:0;padding:0;overflow:hidden}
+.kpi{padding:16px 18px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi:last-child{border-right:0}
+.kpi b{font-size:clamp(22px,2.4vw,30px);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi span.l{font-size:12.5px;color:var(--ink-2)}
+.kpi span.s{font-size:11.5px;color:var(--muted)}
+.g-2{grid-template-columns:1.6fr 1fr}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-2b{grid-template-columns:1fr 1fr}
+
+.flowline{display:grid;grid-template-columns:1fr 28px 1fr 28px 1fr 28px 1fr;align-items:stretch;gap:6px;margin-top:14px}
+.fl{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface-2);display:flex;flex-direction:column;gap:4px}
+.fl b{font-size:20px;font-variant-numeric:tabular-nums}
+.fl span{font-size:12px;color:var(--ink-2)}
+.fl.cs{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.fl .who{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.arr{display:grid;place-items:center;color:var(--muted);font-size:18px}
+
+svg text{font-family:var(--mono);fill:var(--muted);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink-2);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg-line{width:16px;height:2px;background:var(--ink);display:inline-block}
+.lg-dash{width:16px;height:0;border-top:2px dashed var(--accent);display:inline-block;box-shadow:0 0 6px var(--accent)}
+.ind{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:14px;align-items:start}
+.ind-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ind-kpis div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column}
+.ind-kpis b{font-size:22px;font-variant-numeric:tabular-nums}.ind-kpis span{font-size:11.5px;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;border-radius:999px;padding:3px 8px;border:1px solid var(--line);color:var(--ink-2)}
+.tag.cs{border-color:color-mix(in srgb,var(--accent) 60%,var(--line));color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.mock{border:1px solid var(--line);border-radius:14px;background:var(--surface-2);padding:14px;display:flex;flex-direction:column;gap:10px;position:relative}
+.mock .bar-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.mcard{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.mcard h3{font-size:14px}.mcard .row{display:flex;flex-wrap:wrap;gap:6px}
+.mcard dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:12px}.mcard dt{color:var(--muted)}.mcard dd{margin:0}
+.stg{display:flex;gap:3px}.stg i{flex:1;height:5px;border-radius:3px;background:var(--line)}.stg i.on{background:var(--accent)}
+@media (max-width:900px){.ind{grid-template-columns:1fr}}
+
+.hb{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.hb-row{display:grid;grid-template-columns:150px minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:12.5px;cursor:default}
+.hb-row .nm{display:flex;align-items:center;gap:7px;color:var(--ink-2)}
+.hb-track{height:14px;background:var(--surface-2);border-radius:4px;overflow:hidden;position:relative}
+.hb-fill{height:100%;border-radius:0 4px 4px 0}
+.hb-row .v{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.hb-row .v small{display:block;color:var(--muted);font-size:10.5px}
+
+.stack{display:flex;height:22px;gap:2px;margin-top:16px;border-radius:5px;overflow:hidden}
+.stack div{height:100%;min-width:2px}
+.st-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.st-row{display:grid;grid-template-columns:14px 1fr auto auto;gap:10px;align-items:center;font-size:12.5px}
+.st-row .n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.st-row .p{font-family:var(--mono);color:var(--muted);font-size:11px;width:38px;text-align:right}
+
+.health{display:flex;align-items:center;gap:18px;margin-top:14px}
+.health svg{flex:none}
+.hl{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.hl-row{display:grid;grid-template-columns:18px 1fr auto auto;gap:8px;align-items:center;font-size:12.5px}
+.hl-row b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+.hl-row .p{font-family:var(--mono);font-size:11px;color:var(--muted);width:34px;text-align:right}
+.kpi.wide{grid-column:span 2}
+.pb-nums{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pb-nums .of{font-size:12.5px;color:var(--ink-2)}
+.pb-bar{position:relative;height:14px;border-radius:5px;background:color-mix(in srgb,var(--accent-2) 30%,var(--surface-2));margin-top:6px;overflow:hidden}
+.pb-bar{display:flex;gap:2px}.pb-bar i{height:100%;display:block}.pb-bar i.a{background:var(--accent);box-shadow:0 0 12px color-mix(in srgb,var(--accent) 60%,transparent);border-radius:5px 0 0 5px}.pb-bar i.b{background:var(--accent-2)}
+.eq{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin-top:14px}
+.eq .op{display:grid;place-items:center;color:var(--muted);font-size:18px;padding:0 2px}
+.eqb{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:150px;flex:1}
+.eqb b{font-size:18px;font-variant-numeric:tabular-nums}.eqb span{font-size:11.5px;color:var(--ink-2)}
+.eqb .who{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.rules div{border-left:2px solid var(--accent);background:var(--surface-2);border-radius:0 10px 10px 0;padding:10px 12px;font-size:12.5px;color:var(--ink-2)}
+.rules b{display:block;color:var(--ink);font-size:13px;margin-bottom:2px}
+@media (max-width:900px){.rules{grid-template-columns:1fr}}
+.pb-leg{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--muted);margin-top:4px}
+.pb-leg span{display:inline-flex;align-items:center;gap:6px}
+.kd{display:flex;align-items:center;gap:12px}
+.kd svg{flex:none}
+.hc{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.hc b{font-size:22px;font-variant-numeric:tabular-nums}
+.hc .t{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2)}
+.ico{width:14px;height:14px;display:inline-grid;place-items:center;font-size:10px;font-weight:700;border-radius:50%;color:#0F0D15}
+
+.funnel{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.fn{display:grid;grid-template-columns:170px minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:12.5px}
+.fn .bar{height:26px;border-radius:6px;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 85%,transparent),color-mix(in srgb,var(--accent) 55%,transparent));display:flex;align-items:center;padding:0 10px;font-family:var(--mono);font-size:11.5px;color:#06222A;font-weight:500;white-space:nowrap}
+.fn .cv{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto;margin-top:12px}
+.hpill{display:inline-flex;align-items:center;gap:6px}
+.rule{display:grid;grid-template-columns:150px repeat(3,1fr);gap:4px;margin-top:14px;font-size:12.5px}
+.rule .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 8px}
+.rule .rl{padding:8px;color:var(--ink-2)}
+.rule .cell{padding:8px;border-radius:8px;text-align:center;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted);margin-top:10px}
+
+.tip{position:fixed;pointer-events:none;background:#F4F1FA;color:#15131C;border-radius:10px;padding:8px 10px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .1s;z-index:30;max-width:240px}
+.tip b{display:block;font-size:12.5px}
+.tip .r{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:11.5px}
+
+.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:1100px){.g-kpi{grid-template-columns:repeat(2,1fr)}.kpi{border-right:0;border-bottom:1px solid var(--line)}.g-2,.g-3,.g-2b{grid-template-columns:1fr}.flowline{grid-template-columns:1fr;}.arr{transform:rotate(90deg)}}
+@media (max-width:560px){.health{flex-direction:column;align-items:stretch}.health svg{align-self:center}.hb-row{grid-template-columns:110px 1fr 80px}.fn{grid-template-columns:120px 1fr 50px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div>
+      <div class="eyebrow">CITi Flow · Pipe de Sucesso do Cliente</div>
+      <h1>Forecast da <span>Base</span></h1>
+      <p class="sub">O que a carteira de clientes atuais pode gerar em recompra, expansão, retainer e renovação, ponderado pela etapa de cada oportunidade e pela saúde da conta. Visão própria de CS, integrada ao forecast geral de Comercial.</p>
+    </div>
+    <div class="badges"><span class="badge warn">Dados ilustrativos</span><span class="badge">Gestão 2027 · posição em mar/27</span></div>
+  </header>
+
+  <section class="filters" aria-label="Filtrar por tipo de oportunidade">
+    <span class="eyebrow" style="margin-right:6px">Tipo</span>
+    <div id="chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  </section>
+
+  <section class="card grid g-kpi" id="kpis" aria-label="Indicadores"></section>
+
+
+
+
+
+
+  <section class="grid g-2">
+    <div class="card">
+      <h2>Ritmo da base</h2>
+      <p class="hint">Receita realizada vinda de clientes atuais e forecast ponderado para os próximos meses.</p>
+      <div id="lineChart" style="margin-top:12px"></div>
+      <div class="legend"><span><i class="lg-line"></i>Realizado</span><span><i class="lg-dash"></i>Forecast ponderado</span></div>
+    </div>
+    <div class="card">
+      <h2>Composição da base</h2>
+      <p class="hint">Potencial bruto por nível de confiança.</p>
+      <div class="stack" id="compStack"></div>
+      <div class="st-list" id="compList"></div>
+    </div>
+  </section>
+
+  <section class="grid g-3">
+    <div class="card">
+      <h2>Por tipo de oportunidade</h2>
+      <p class="hint">Forecast ponderado (bruto abaixo).</p>
+      <div class="hb" id="byType"></div>
+    </div>
+    <div class="card">
+      <h2>Saúde da carteira</h2>
+      <p class="hint">Contas por estado de saúde e, abaixo, o potencial bruto de cada grupo.</p>
+      <div class="health" id="health"></div>
+      <div class="hb" id="byHealth"></div>
+    </div>
+    <div class="card">
+      <h2>Da carteira ao contrato</h2>
+      <p class="hint">Quantas oportunidades identificadas por CS avançam.</p>
+      <div class="funnel" id="funnel"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Indicações vindas da carteira</h2>
+    <p class="hint">Quando uma conta bem acompanhada indica outra empresa, o card entra no pipeline de Comercial com origem “indicação de cliente · CS”. A conversão também conta como resultado de CS. Não depende do filtro de tipo.</p>
+    <div class="ind">
+      <div>
+        <div class="ind-kpis" id="indKpis"></div>
+        <div class="tbl"><table id="indTable"></table></div>
+      </div>
+      <div class="mock" aria-label="Exemplo de card no pipeline de Comercial">
+        <div class="bar-top"><span>CITi Flow · Pipeline Comercial</span><span>exemplo</span></div>
+        <div class="mcard">
+          <div class="row"><span class="tag cs">◆ Origem: indicação de cliente · CS</span></div>
+          <h3>Rede Clara · Discovery</h3>
+          <div class="stg" aria-label="Etapa: Ganha"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          <dl><dt>Indicado por</dt><dd>Clínica Aurora (conta saudável)</dd><dt>Gatilho</dt><dd>Revisão de valor após a entrega</dd><dt>Etapa</dt><dd>Ganha · R$ 11 mil</dd><dt>Responsáveis</dt><dd>Comercial conduz · CS acompanha</dd></dl>
+        </div>
+        <p class="note" style="margin:0">A origem fica registrada no card, então dá para medir quanto do faturamento novo nasce do relacionamento com a carteira.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid g-2b">
+    <div class="card">
+      <h2>Por mês previsto</h2>
+      <p class="hint">Forecast ponderado por tipo de oportunidade.</p>
+      <div id="monthChart" style="margin-top:12px"></div>
+      <div class="legend" id="monthLegend"></div>
+    </div>
+    <div class="card">
+      <h2>Régua de probabilidade</h2>
+      <p class="hint">Probabilidade da etapa × saúde da conta. Ponto de partida; recalibrada ao longo da gestão com o que for observado.</p>
+      <div class="rule" id="rule"></div>
+      <p class="note">Conta vermelha não entra na previsão: primeiro a relação é estabilizada.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Como a base entra no forecast geral</h2>
+    <p class="hint">Um card, duas visões: a oportunidade é <strong>movida</strong>, não copiada. Quando qualificada, o mesmo card passa para o funil de Comercial com a etiqueta “base”, e o painel de CS continua lendo esse card pela etiqueta.</p>
+    <div class="flowline" id="flowline"></div>
+    <div class="eq" id="eq"></div>
+    <div class="rules">
+      <div><b>Um registro só</b>Cada oportunidade existe em um único card no CITi Flow. Ao ser qualificada, ela muda de pipe; não nasce um segundo card.</div>
+      <div><b>Quem soma o quê</b>O forecast geral soma apenas os cards do funil de Comercial. O forecast da base nunca é somado a ele; é uma leitura filtrada pela etiqueta.</div>
+      <div><b>O vínculo com CS</b>A etiqueta “base” (ou “indicação de cliente · CS”) liga o card à conta no pipe de CS. Comercial conduz a venda e CS acompanha até o fechamento.</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Por conta</h2>
+    <p class="hint">Oportunidades da base ordenadas pelo forecast ponderado.</p>
+    <div class="tbl"><table id="table"></table></div>
+  </section>
+
+  <p class="foot">Protótipo de visualização da proposta para a Gerência de Customer Success. Contas e valores fictícios. A régua de probabilidade será definida com Negócios e Inovação e recalibrada com os padrões observados ao longo da gestão.</p>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+const TYPES={recompra:{l:"Recompra",c:"var(--t-recompra)"},expansao:{l:"Expansão",c:"var(--t-expansao)"},retainer:{l:"Retainer",c:"var(--t-retainer)"},synergy:{l:"Renovação Synergy",c:"var(--t-synergy)"}};
+const STAGES={identificada:{l:"Identificada",p:.10},validada:{l:"Validada com o cliente",p:.25},proposta:{l:"Proposta apresentada",p:.50},negociacao:{l:"Negociação",p:.75}};
+const HEALTH={verde:{l:"Saudável",m:1,c:"var(--good)",i:"✓"},amarelo:{l:"Em atenção",m:.5,c:"var(--warn)",i:"!"},vermelho:{l:"Em risco",m:0,c:"var(--crit)",i:"✕"}};
+const OPPS=[
+ {conta:"Grupo Terra",tipo:"synergy",saude:"verde",etapa:"negociacao",valor:18,mes:"abr"},
+ {conta:"Clínica Aurora",tipo:"expansao",saude:"verde",etapa:"proposta",valor:12,mes:"abr"},
+ {conta:"Energia Mar",tipo:"recompra",saude:"verde",etapa:"negociacao",valor:9,mes:"mai"},
+ {conta:"Saúde Vida",tipo:"retainer",saude:"verde",etapa:"proposta",valor:6,mes:"mai"},
+ {conta:"Construtora Lume",tipo:"recompra",saude:"verde",etapa:"validada",valor:10,mes:"jun"},
+ {conta:"Fintech Ponte",tipo:"expansao",saude:"amarelo",etapa:"proposta",valor:14,mes:"jun"},
+ {conta:"EduMais",tipo:"retainer",saude:"amarelo",etapa:"identificada",valor:5,mes:"jun"},
+ {conta:"Agro Norte",tipo:"expansao",saude:"verde",etapa:"identificada",valor:15,mes:"jun"},
+ {conta:"Varejo Sol",tipo:"expansao",saude:"vermelho",etapa:"identificada",valor:10,mes:"—"}
+];
+OPPS.forEach(o=>o.pond=o.valor*STAGES[o.etapa].p*HEALTH[o.saude].m);
+const REALIZED_T={jan:{},fev:{recompra:8},mar:{retainer:4}};
+const realOf=m=>Object.entries(REALIZED_T[m]||{}).filter(([k])=>!filter||k===filter).reduce((s,[,v])=>s+v,0);
+const CSTAGES=[["Qualificação",.10],["Diagnóstico técnico",.25],["Apresentação de proposta",.50],["Negociação",.75],["Ganha",1]];
+const INDIC=[
+ {lead:"Rede Clara",por:"Clínica Aurora",etapa:4,valor:11,mes:"fev"},
+ {lead:"Porto Log",por:"Grupo Terra",etapa:3,valor:15,mes:"mai"},
+ {lead:"Solar Agreste",por:"Energia Mar",etapa:0,valor:8,mes:"jun"}
+];
+const WON=2, FORECAST_GERAL=250;
+const MONTHS=["jan","fev","mar","abr","mai","jun"];
+
+const fmt=v=>"R$ "+(Math.round(v*10)/10).toLocaleString("pt-BR")+" mil";
+const fmtS=v=>"R$ "+Math.round(v)+" mil";
+let filter=null;
+const sel=()=>OPPS.filter(o=>!filter||o.tipo===filter);
+
+/* chips */
+const chips=document.getElementById("chips");
+chips.innerHTML=`<button class="chip" data-t="" aria-pressed="true">Todos</button>`+Object.entries(TYPES).map(([k,t])=>`<button class="chip" data-t="${k}" aria-pressed="false"><i class="sw" style="background:${t.c}"></i>${t.l}</button>`).join("");
+chips.addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;filter=b.dataset.t||null;chips.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",String((c.dataset.t||null)===filter)));render();});
+
+/* tooltip */
+const tip=document.getElementById("tip");
+function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;const x=Math.min(e.clientX+14,innerWidth-250),y=Math.max(e.clientY-10-tip.offsetHeight,8);tip.style.left=x+"px";tip.style.top=y+"px";}
+function hideTip(){tip.style.opacity=0;}
+function bindTips(root){root.querySelectorAll("[data-tip]").forEach(el=>{el.addEventListener("mousemove",e=>showTip(e,el.dataset.tip));el.addEventListener("mouseleave",hideTip);});}
+const T=(title,rows)=>`<b>${title}</b>${rows.map(r=>`<div class="r"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}`;
+
+function render(){
+ const d=sel();
+ const bruto=d.reduce((s,o)=>s+o.valor,0), pond=d.reduce((s,o)=>s+o.pond,0);
+ const noFunil=d.filter(o=>o.etapa==="proposta"||o.etapa==="negociacao");
+ const pondFunil=noFunil.reduce((s,o)=>s+o.pond,0);
+ const contas=[...new Set(d.map(o=>o.conta))];
+ const realizado=["jan","fev","mar"].reduce((s,m)=>s+realOf(m),0);
+
+ /* KPIs */
+ const pct=Math.round(pond/Math.max(bruto,1)*100), share=Math.round(pondFunil/FORECAST_GERAL*100);
+ const healthy=Math.round(contas.filter(c=>d.find(o=>o.conta===c).saude==="verde").length/Math.max(contas.length,1)*100);
+ const kpi=(l,v,sub,cls="")=>`<div class="kpi ${cls}"><span class="l">${l}</span>${v}${sub?`<span class="s">${sub}</span>`:""}</div>`;
+ const donut=(p,c,size=52)=>{const r=size/2-5,C=2*Math.PI*r;return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="7"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 ${size/2} ${size/2})"/></svg>`};
+ document.getElementById("kpis").innerHTML=
+  kpi("Forecast ponderado dentro do potencial bruto",
+   `<div class="pb-nums"><b>${fmtS(pond)}</b><span class="of">esperados de <strong>${fmtS(bruto)}</strong> possíveis · ${d.length} oportunidades</span></div>
+    <div class="pb-bar" data-tip="${T("Potencial da base",[["Potencial bruto",fmtS(bruto)],["Ponderado no funil de Comercial",fmt(pondFunil)],["Ponderado ainda com CS",fmt(pond-pondFunil)],["Ponderado / bruto",pct+"%"]]).replace(/"/g,"&quot;")}"><i class="a" style="width:${pondFunil/Math.max(bruto,1)*100}%"></i><i class="b" style="width:${(pond-pondFunil)/Math.max(bruto,1)*100}%"></i></div>
+    <div class="pb-leg"><span><i class="sw" style="background:var(--accent)"></i>No funil de Comercial · ${fmtS(pondFunil)}</span><span><i class="sw" style="background:var(--accent-2)"></i>Ainda com CS · ${fmtS(pond-pondFunil)}</span><span><i class="sw" style="background:color-mix(in srgb,var(--accent-2) 30%,var(--surface-2))"></i>Restante do potencial bruto</span></div>`,"","wide")+
+  kpi("Receita da base no ano",`<b>${fmtS(realizado)}</b>`,filter?TYPES[filter].l.toLowerCase()+" de jan a mar":"+ "+fmtS(INDIC.filter(i=>i.etapa===4).reduce((s,i)=>s+i.valor,0))+" de indicações")+
+  kpi("Base no forecast geral",`<div class="kd">${donut(share,"var(--accent)")}<b>${share}%</b></div>`,`${fmtS(pondFunil)} de ${fmtS(FORECAST_GERAL)}`)+
+  kpi("Contas com potencial",`<b>${contas.length}</b>`,"na carteira ativa")+
+  kpi("Contas saudáveis",`<div class="kd">${donut(healthy,"var(--good)")}<b>${healthy}%</b></div>`,"base para expansão");
+
+ /* flow */
+ const ident=d.length, valid=d.filter(o=>o.etapa!=="identificada").length;
+ document.getElementById("flowline").innerHTML=`
+  <div class="fl cs"><span class="who">CS · pipe de CS</span><b>${ident}</b><span>oportunidades mapeadas na carteira (dores fora do escopo, ideias dos squads, sinais de CS)</span></div><div class="arr">→</div>
+  <div class="fl cs"><span class="who">CS · qualificação</span><b>${valid}</b><span>validadas com o cliente, em contas que reconhecem o valor da entrega</span></div><div class="arr">→</div>
+  <div class="fl"><span class="who">Comercial · funil</span><b>${noFunil.length}</b><span>no funil de Comercial com origem “base”, ponderado em ${fmtS(pondFunil)}</span></div><div class="arr">→</div>
+  <div class="fl"><span class="who">Forecast geral</span><b>${Math.round(pondFunil/FORECAST_GERAL*100)}%</b><span>da receita prevista por Comercial vem de clientes da carteira</span></div>`;
+ const preF=pond-pondFunil;
+ document.getElementById("eq").innerHTML=`
+  <div class="eqb"><span class="who">Ainda com CS · pré-funil</span><b>${fmtS(preF)}</b><span>só no forecast da base; não entra no geral</span></div><div class="op">+</div>
+  <div class="eqb" style="border-color:color-mix(in srgb,var(--accent) 55%,var(--line))"><span class="who">No funil · etiqueta “base”</span><b>${fmtS(pondFunil)}</b><span>o mesmo card, contado uma vez no geral</span></div><div class="op">=</div>
+  <div class="eqb"><span class="who">Forecast da base (visão de CS)</span><b>${fmtS(pond)}</b><span>leitura filtrada, nunca somada ao geral</span></div>
+  <div class="eqb" style="flex:1.2"><span class="who">Forecast geral (Comercial)</span><b>${fmtS(FORECAST_GERAL)}</b><span>inclui os ${fmtS(pondFunil)} da base uma única vez</span></div>`;
+
+ /* line */
+ lineChart(d);
+
+ /* composition */
+ const comp=[
+  {k:"Comprometido",c:"var(--c-1)",f:o=>o.saude==="verde"&&(o.etapa==="proposta"||o.etapa==="negociacao")},
+  {k:"Provável",c:"var(--c-2)",f:o=>o.saude==="verde"&&(o.etapa==="identificada"||o.etapa==="validada")},
+  {k:"Em atenção",c:"var(--c-3)",f:o=>o.saude==="amarelo"},
+  {k:"Fora da previsão",c:"var(--c-4)",f:o=>o.saude==="vermelho"}
+ ].map(x=>({...x,v:d.filter(x.f).reduce((s,o)=>s+o.valor,0),n:d.filter(x.f).length}));
+ const tot=Math.max(comp.reduce((s,x)=>s+x.v,0),1);
+ document.getElementById("compStack").innerHTML=comp.filter(x=>x.v>0).map(x=>`<div data-tip="${T(x.k,[["Bruto",fmtS(x.v)],["Oportunidades",x.n]]).replace(/"/g,"&quot;")}" style="flex:${x.v};background:${x.c}"></div>`).join("");
+ document.getElementById("compList").innerHTML=comp.map(x=>`<div class="st-row"><i class="sw" style="background:${x.c}"></i><span>${x.k}</span><span class="n">${fmtS(x.v)}</span><span class="p">${Math.round(x.v/tot*100)}%</span></div>`).join("");
+
+ /* by type */
+ const types=Object.entries(TYPES).map(([k,t])=>{const o=d.filter(x=>x.tipo===k);return{k,...t,p:o.reduce((s,x)=>s+x.pond,0),b:o.reduce((s,x)=>s+x.valor,0),n:o.length}}).filter(t=>t.n);
+ const maxT=Math.max(...types.map(t=>t.p),1);
+ document.getElementById("byType").innerHTML=types.map(t=>`<div class="hb-row" data-tip="${T(t.l,[["Ponderado",fmt(t.p)],["Bruto",fmtS(t.b)],["Oportunidades",t.n]]).replace(/"/g,"&quot;")}"><span class="nm"><i class="sw" style="background:${t.c}"></i>${t.l}</span><span class="hb-track"><span class="hb-fill" style="display:block;width:${t.p/maxT*100}%;background:${t.c}"></span></span><span class="v">${fmtS(t.p)}<small>${fmtS(t.b)} bruto</small></span></div>`).join("");
+
+ /* health */
+ const hc=Object.entries(HEALTH).map(([k,h])=>{const cs=contas.filter(c=>d.find(o=>o.conta===c).saude===k);const o=d.filter(x=>x.saude===k);return{k,...h,n:cs.length,b:o.reduce((s,x)=>s+x.valor,0)}});
+ {const tot=Math.max(hc.reduce((s,h)=>s+h.n,0),1),S=132,r=50,C=2*Math.PI*r;let off=0,arcs="";
+  hc.forEach(h=>{if(!h.n)return;const len=C*h.n/tot;arcs+=`<circle cx="${S/2}" cy="${S/2}" r="${r}" fill="none" stroke="${h.c}" stroke-width="16" stroke-dasharray="${Math.max(len-3,1)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 ${S/2} ${S/2})" data-tip="${T(h.l,[["Contas",h.n],["Parcela",Math.round(h.n/tot*100)+"%"]]).replace(/"/g,"&quot;")}"/>`;off+=len;});
+  document.getElementById("health").innerHTML=`<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" role="img" aria-label="Contas por estado de saúde">${arcs}<text x="${S/2}" y="${S/2+2}" text-anchor="middle" style="font-family:var(--f);font-size:26px;font-weight:600;fill:var(--ink)">${tot}</text><text x="${S/2}" y="${S/2+20}" text-anchor="middle">contas</text></svg><div class="hl">${hc.map(h=>`<div class="hl-row"><i class="ico" style="background:${h.c}">${h.i}</i><span>${h.l}</span><b>${h.n}</b><span class="p">${Math.round(h.n/tot*100)}%</span></div>`).join("")}</div>`;}
+ const maxH=Math.max(...hc.map(h=>h.b),1);
+ document.getElementById("byHealth").innerHTML=hc.map(h=>`<div class="hb-row" data-tip="${T(h.l,[["Potencial bruto",fmtS(h.b)],["Peso na previsão","× "+String(h.m).replace(".",",")]]).replace(/"/g,"&quot;")}"><span class="nm"><i class="ico" style="background:${h.c}">${h.i}</i>${h.l}</span><span class="hb-track"><span class="hb-fill" style="display:block;width:${h.b/maxH*100}%;background:${h.c}"></span></span><span class="v">${fmtS(h.b)}</span></div>`).join("");
+
+ /* funnel */
+ const fsteps=[["Identificadas por CS",ident],["Validadas com o cliente",valid],["No funil de Comercial",noFunil.length],["Ganhas no ano",filter?null:WON]];
+ const mx=Math.max(ident,1);
+ document.getElementById("funnel").innerHTML=fsteps.map((s,i)=>s[1]==null?"":`<div class="fn"><span>${s[0]}</span><span><span class="bar" style="width:${Math.max(s[1]/mx*100,14)}%">${s[1]}</span></span><span class="cv">${i&&fsteps[i-1][1]?Math.round(s[1]/fsteps[i-1][1]*100)+"%":""}</span></div>`).join("")+`<p class="note">Percentual: conversão em relação à etapa anterior. Hoje, clientes antigos geram menos de 2% do faturamento.</p>`;
+
+ /* month stacked */
+ monthChart(d);
+
+ /* rule */
+ const r=document.getElementById("rule");
+ r.innerHTML=`<div class="h"></div>`+Object.values(HEALTH).map(h=>`<div class="h hpill" style="justify-content:center"><i class="ico" style="background:${h.c}">${h.i}</i>${h.l}</div>`).join("")+
+  Object.values(STAGES).map(s=>`<div class="rl">${s.l}</div>`+Object.values(HEALTH).map(h=>{const v=Math.round(s.p*h.m*100);return `<div class="cell" style="background:color-mix(in srgb,var(--accent) ${v?Math.round(v*0.9)+10:0}%,var(--surface-2));color:${v>40?"#06222A":"var(--ink)"}">${v?v+"%":"—"}</div>`}).join("")).join("");
+
+ /* table */
+ const rows=[...d].sort((a,b)=>b.pond-a.pond);
+ document.getElementById("table").innerHTML=`<thead><tr><th>Conta</th><th>Tipo</th><th>Saúde</th><th>Etapa</th><th>Mês</th><th style="text-align:right">Bruto</th><th style="text-align:right">Ponderado</th></tr></thead><tbody>${rows.map(o=>`<tr><td>${o.conta}</td><td><span class="hpill"><i class="sw" style="background:${TYPES[o.tipo].c}"></i>${TYPES[o.tipo].l}</span></td><td><span class="hpill"><i class="ico" style="background:${HEALTH[o.saude].c}">${HEALTH[o.saude].i}</i>${HEALTH[o.saude].l}</span></td><td>${STAGES[o.etapa].l}</td><td>${o.mes}</td><td class="num">${fmtS(o.valor)}</td><td class="num">${fmt(o.pond)}</td></tr>`).join("")}</tbody>`;
+
+ /* indications */
+ const ganhas=INDIC.filter(i=>i.etapa===4),abertas=INDIC.filter(i=>i.etapa<4);
+ document.getElementById("indKpis").innerHTML=`<div><b>${INDIC.length}</b><span>indicações recebidas</span></div><div><b>${ganhas.length}</b><span>convertidas · ${fmtS(ganhas.reduce((s,i)=>s+i.valor,0))}</span></div><div><b>${fmtS(abertas.reduce((s,i)=>s+i.valor*CSTAGES[i.etapa][1],0))}</b><span>no forecast de Comercial</span></div>`;
+ document.getElementById("indTable").innerHTML=`<thead><tr><th>Lead</th><th>Indicado por</th><th>Etapa no Comercial</th><th style="text-align:right">Valor</th></tr></thead><tbody>${INDIC.map(i=>`<tr><td>${i.lead}</td><td>${i.por}</td><td><span class="hpill"><span class="stg" style="width:56px">${CSTAGES.map((_,k)=>`<i class="${k<=i.etapa?"on":""}"></i>`).join("")}</span>${CSTAGES[i.etapa][0]}</span></td><td class="num">${fmtS(i.valor)}</td></tr>`).join("")}</tbody>`;
+
+ bindTips(document);
+}
+
+function smooth(P){ /* curva monotônica: suave sem passar abaixo de zero */
+ const n=P.length;if(n<2)return "";const dx=[],dy=[],ms=[],t=[];
+ for(let i=0;i<n-1;i++){dx[i]=P[i+1][0]-P[i][0];dy[i]=P[i+1][1]-P[i][1];ms[i]=dy[i]/dx[i];}
+ t[0]=ms[0];t[n-1]=ms[n-2];for(let i=1;i<n-1;i++)t[i]=ms[i-1]*ms[i]<=0?0:(ms[i-1]+ms[i])/2;
+ for(let i=0;i<n-1;i++){if(ms[i]===0){t[i]=t[i+1]=0;continue;}const a=t[i]/ms[i],b=t[i+1]/ms[i],h=a*a+b*b;if(h>9){const k=3/Math.sqrt(h);t[i]=k*a*ms[i];t[i+1]=k*b*ms[i];}}
+ let d=`M${P[0][0]},${P[0][1]}`;for(let i=0;i<n-1;i++){const h=dx[i]/3;d+=` C${P[i][0]+h},${P[i][1]+t[i]*h} ${P[i+1][0]-h},${P[i+1][1]-t[i+1]*h} ${P[i+1][0]},${P[i+1][1]}`;}return d;}
+function lineChart(d){
+ const el=document.getElementById("lineChart");const W=el.clientWidth||640,H=260,m={l:56,r:30,t:26,b:28};
+ const fc={};MONTHS.forEach(x=>fc[x]=0);d.forEach(o=>{if(fc[o.mes]!=null)fc[o.mes]+=o.pond;});
+ const real=["jan","fev","mar"].map(m=>({m,v:realOf(m)}));
+ const fpts=[{m:"mar",v:realOf("mar")},...["abr","mai","jun"].map(x=>({m:x,v:fc[x]}))];
+ const maxV=Math.max(20,...real.map(r=>r.v),...fpts.map(r=>r.v))*1.15;
+ const X=i=>m.l+i*(W-m.l-m.r)/(MONTHS.length-1),Y=v=>H-m.b-v/maxV*(H-m.t-m.b);
+ const idx=x=>MONTHS.indexOf(x);
+ let g="";
+ for(let k=0;k<=4;k++){const v=maxV/4*k;g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${m.l-8}" y="${Y(v)+4}" text-anchor="end">${Math.round(v)}</text>`;}
+ MONTHS.forEach((x,i)=>g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle">${x}/27</text>`);
+ g+=`<line x1="${X(2)}" x2="${X(2)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="${X(2)+6}" y="${m.t+10}">hoje</text>`;
+ const path=pts=>smooth(pts.map(p=>[X(idx(p.m)),Y(p.v)]));
+ const base=H-m.b,fx=fpts.map(p=>X(idx(p.m)));
+ g+=`<defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".28"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent-2)" stop-opacity=".25"/><stop offset="1" stop-color="var(--accent-2)" stop-opacity="0"/></linearGradient><filter id="glow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+ g+=`<path d="${path(fpts)} L${fx[fx.length-1]},${base} L${fx[0]},${base} Z" fill="url(#gf)"/>`;
+ g+=`<path d="${path(real)} L${X(2)},${base} L${X(0)},${base} Z" fill="url(#gr)"/>`;
+ g+=`<path d="${path(real)}" fill="none" stroke="var(--ink)" stroke-width="2"/>`+real.map(p=>`<circle cx="${X(idx(p.m))}" cy="${Y(p.v)}" r="4" fill="var(--ink)" stroke="var(--surface)" stroke-width="2"/>`).join("");
+ g+=`<path d="${path(fpts)}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-dasharray="7 5" filter="url(#glow)"/>`+fpts.slice(1).map(p=>`<circle cx="${X(idx(p.m))}" cy="${Y(p.v)}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>`).join("");
+ g+=`<line id="xh" y1="${m.t}" y2="${H-m.b}" stroke="var(--ink-2)" opacity="0"/>`;
+ el.innerHTML=`<svg width="100%" viewBox="0 0 ${W} ${H}" role="img" aria-label="Receita realizada da base e forecast ponderado por mês"><text x="${m.l-8}" y="${m.t-14}" text-anchor="end">R$ mil</text>${g}<rect id="hit" x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="transparent"/></svg>`;
+ const svg=el.querySelector("svg"),hit=svg.querySelector("#hit"),xh=svg.querySelector("#xh");
+ hit.addEventListener("mousemove",e=>{const r=svg.getBoundingClientRect();const sx=(e.clientX-r.left)*W/r.width;const i=Math.max(0,Math.min(MONTHS.length-1,Math.round((sx-m.l)/((W-m.l-m.r)/(MONTHS.length-1)))));
+  xh.setAttribute("x1",X(i));xh.setAttribute("x2",X(i));xh.setAttribute("opacity",.5);
+  const mm=MONTHS[i],rr=real.find(p=>p.m===mm),ff=fpts.find(p=>p.m===mm&&p.m!=="mar");
+  showTip(e,T(mm+"/27",[["Realizado",rr?fmtS(rr.v):"—"],["Forecast ponderado",ff?fmt(ff.v):"—"]]));});
+ hit.addEventListener("mouseleave",()=>{xh.setAttribute("opacity",0);hideTip();});
+}
+
+function monthChart(d){
+ const el=document.getElementById("monthChart");const W=el.clientWidth||520,H=230,m={l:44,r:10,t:10,b:28};
+ const ms=["abr","mai","jun"];const keys=Object.keys(TYPES);
+ const data=ms.map(x=>{const o={m:x};keys.forEach(k=>o[k]=d.filter(p=>p.mes===x&&p.tipo===k).reduce((s,p)=>s+p.pond,0));o.t=keys.reduce((s,k)=>s+o[k],0);return o;});
+ const maxV=Math.max(10,...data.map(x=>x.t))*1.15;
+ const bw=Math.min(70,(W-m.l-m.r)/ms.length*.5);
+ const X=i=>m.l+(i+.5)*(W-m.l-m.r)/ms.length,Y=v=>H-m.b-v/maxV*(H-m.t-m.b);
+ let g="";
+ for(let k=0;k<=4;k++){const v=maxV/4*k;g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${m.l-6}" y="${Y(v)+4}" text-anchor="end">${Math.round(v)}</text>`;}
+ data.forEach((x,i)=>{let acc=0;const segs=keys.filter(k=>x[k]>0);
+  segs.forEach((k,j)=>{const y0=Y(acc),y1=Y(acc+x[k]);const h=Math.max(y0-y1-2,1);const top=j===segs.length-1;
+   g+=`<path d="${top?`M${X(i)-bw/2},${y0-2} V${y1+4} q0,-4 4,-4 H${X(i)+bw/2-4} q4,0 4,4 V${y0-2} Z`:`M${X(i)-bw/2},${y0-2} V${y0-2-h} H${X(i)+bw/2} V${y0-2} Z`}" fill="${TYPES[k].c}" data-tip="${T(TYPES[k].l+" · "+x.m+"/27",[["Ponderado",fmt(x[k])]]).replace(/"/g,"&quot;")}"/>`;acc+=x[k];});
+  g+=`<text x="${X(i)}" y="${Y(x.t)-6}" text-anchor="middle" style="fill:var(--ink-2)">${x.t?Math.round(x.t):""}</text><text x="${X(i)}" y="${H-8}" text-anchor="middle">${x.m}/27</text>`;});
+ el.innerHTML=`<svg width="100%" viewBox="0 0 ${W} ${H}" role="img" aria-label="Forecast ponderado por mês e tipo">${g}</svg>`;
+ document.getElementById("monthLegend").innerHTML=keys.filter(k=>!filter||k===filter).map(k=>`<span><i class="sw" style="background:${TYPES[k].c}"></i>${TYPES[k].l}</span>`).join("");
+}
+render();
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,150);});
+</script>
+</body>
+</html>
