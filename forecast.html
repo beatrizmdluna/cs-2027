@@ -146,6 +146,8 @@ td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-num
 .tip b{display:block;font-size:12.5px}
 .tip .r{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:11.5px}
 
+[id]{scroll-margin-top:16px}
+.card.focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 28px color-mix(in srgb,var(--accent) 30%,transparent);transition:box-shadow .6s,border-color .6s}
 .foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
 @media (max-width:1100px){.g-kpi{grid-template-columns:repeat(2,1fr)}.kpi{border-right:0;border-bottom:1px solid var(--line)}.g-2,.g-3,.g-2b{grid-template-columns:1fr}.flowline{grid-template-columns:1fr;}.arr{transform:rotate(90deg)}}
 @media (max-width:560px){.health{flex-direction:column;align-items:stretch}.health svg{align-self:center}.hb-row{grid-template-columns:110px 1fr 80px}.fn{grid-template-columns:120px 1fr 50px}}
@@ -208,7 +210,7 @@ td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-num
     </div>
   </section>
 
-  <section class="card">
+  <section class="card" id="indicacoes">
     <h2>Indicações vindas da carteira</h2>
     <p class="hint">Quando uma conta bem acompanhada indica outra empresa, o card entra no pipeline de Comercial com origem “indicação de cliente · CS”. A conversão também conta como resultado de CS. Não depende do filtro de tipo.</p>
     <div class="ind">
@@ -244,7 +246,7 @@ td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-num
     </div>
   </section>
 
-  <section class="card">
+  <section class="card" id="forecast-geral">
     <h2>Como a base entra no forecast geral</h2>
     <p class="hint">Um card, duas visões: a oportunidade é <strong>movida</strong>, não copiada. Quando qualificada, o mesmo card passa para o funil de Comercial com a etiqueta “base”, e o painel de CS continua lendo esse card pela etiqueta.</p>
     <div class="flowline" id="flowline"></div>
@@ -451,6 +453,8 @@ function monthChart(d){
  document.getElementById("monthLegend").innerHTML=keys.filter(k=>!filter||k===filter).map(k=>`<span><i class="sw" style="background:${TYPES[k].c}"></i>${TYPES[k].l}</span>`).join("");
 }
 render();
+(function(){const id=decodeURIComponent((location.hash||"").slice(1));const el=id&&document.getElementById(id);if(!el)return;
+ setTimeout(()=>{el.scrollIntoView({block:"start"});el.classList.add("focus");setTimeout(()=>el.classList.remove("focus"),4000);},250);})();
 let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,150);});
 </script>
 </body>
