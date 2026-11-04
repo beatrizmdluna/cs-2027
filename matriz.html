@@ -318,7 +318,7 @@ function lanes(){
   const bx=X(0)+cw*.34,by=(Y(jcs)+Y(jg))/2-6;
   g+=`<g data-tip="${q(lab)}"><circle cx="${bx}" cy="${by}" r="11" fill="var(--accent)"/><text x="${bx}" y="${by+4}" text-anchor="middle" style="fill:#06222A;font-weight:600">1</text></g>`;}
  g+=arrow(X(3)+14,Y(jg)+14,X(3)+14,Y(jd)-14,2,"<b>Discovery → Delivery</b>O gerente de Produto passa o projeto ao gerente de Dev ou Dados; CS conduz o onboarding da solução e mantém o mesmo rosto para o cliente.",44);
- g+=arrow(X(4)+16,Y(jd)-12,X(5)-12,Y(jcs)+16,3,"<b>Entrega → implementação assistida</b>CS assume o acompanhamento do uso e da adoção; o gerente de Dev ou Dados garante o domínio técnico.",0);
+ g+=arrow(X(4)+16,Y(jd)-12,X(5)-12,Y(jcs)+16,3,"<b>Entrega → implementação assistida</b>As pessoas do projeto, escolhidas pelo gerente de Dev ou Dados, conduzem a implementação; CS acompanha o uso, a adoção e os indicadores.",0);
  g+=arrow(X(6)+20,Y(jcs)-16,X(6)+20,Y(jn)+14,4,"<b>Oportunidade → funil de Comercial</b>A oportunidade qualificada volta a Negócios com origem “base”.",30);
  // nodes
  STAGES.forEach((s,i)=>ROLES.forEach((r,j)=>{
@@ -337,7 +337,7 @@ document.getElementById("laneLegend").innerHTML=`<span><svg width="30" height="2
 document.getElementById("hand").innerHTML=[
  ["1","Venda → projeto (dupla)","Negócios passa o contexto a CS e ao gerente de Produto ao mesmo tempo; os dois chegam juntos ao onboarding."],
  ["2","Discovery → Delivery","O gerente de Produto passa o projeto ao gerente de Dev ou Dados; CS mantém o mesmo rosto para o cliente."],
- ["3","Entrega → implementação","CS assume o acompanhamento do uso e da adoção junto ao gerente de Dev ou Dados."],
+ ["3","Entrega → implementação","As pessoas do projeto, escolhidas pelo gerente, conduzem a implementação; CS acompanha uso, adoção e indicadores."],
  ["4","Oportunidade → Comercial","A oportunidade qualificada volta ao funil de Comercial com origem “base”."]
 ].map(h=>`<div><i>${h[0]}</i><span><b>${h[1]}</b>${h[2]}</span></div>`).join("");
 
