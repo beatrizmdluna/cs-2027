@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jornada base por tipo de projeto · CS · CITi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Mesma linguagem da jornada.html: fundo roxo-escuro, título com destaque verde, raias por papel, diamantes nas entregas-chave.
+   Modelo intermediário: o gerente é dono da relação; CS entra em momentos definidos. */
+:root{color-scheme:dark;--bg:#0A0912;--pn:#100F1B;--pn2:#16142A;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);--ink:#F4F3FA;--ink2:#B4B1C8;--mut:#77738F;--g:#39F28A;--p:#7C5CFF;--pl:#3B2F7A;--y:#FFC24B;--b:#3D7BFF;--sans:"Plus Jakarta Sans",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);overflow-x:clip}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(50vw 40vh at 90% 0%,rgba(124,92,255,.12),transparent 70%),radial-gradient(40vw 40vh at 0% 100%,rgba(57,242,138,.06),transparent 70%)}
+h1,h2,h3,p{margin:0}button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--g);outline-offset:3px}
+.wrap{max-width:1560px;margin:0 auto;padding:clamp(24px,4vw,48px) clamp(16px,3vw,40px) 60px;position:relative}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+h1{font-size:clamp(32px,4.4vw,50px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-top:8px}h1 span{color:var(--g)}
+.badge{font-family:var(--mono);font-size:12px;color:var(--ink2);border:1px solid var(--line2);border-radius:999px;padding:7px 14px}
+.bar{margin-top:24px;border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(255,255,255,.015)}
+.bar .lab{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--mut);margin-right:6px}
+.tab{border:1px solid var(--line2);background:transparent;border-radius:999px;padding:9px 18px;font-size:15px;font-weight:500;display:inline-flex;gap:10px;align-items:center;min-height:44px;transition:background .2s,border-color .2s}
+.tab .n{font-family:var(--mono);font-size:12px;color:var(--mut)}.tab:hover{border-color:rgba(57,242,138,.5)}
+.tab[aria-selected="true"]{background:var(--g);border-color:var(--g);color:#06150D;box-shadow:0 0 24px rgba(57,242,138,.3)}.tab[aria-selected="true"] .n{color:#0A3A1F}
+.bar .meta{margin-left:auto;font-size:13.5px;color:var(--ink2)}
+.card{margin-top:22px;border:1px solid var(--line);border-radius:22px;padding:26px 26px 22px;background:var(--pn)}
+.card .k{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--g)}
+.card h2{font-size:clamp(20px,2.2vw,25px);font-weight:700;letter-spacing:-.02em;margin-top:8px}
+.card .sub{color:var(--ink2);margin-top:8px;max-width:95ch;font-size:15px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.stat{border:1px solid var(--line);border-radius:14px;padding:12px 14px}.stat b{display:block;font-size:26px;font-weight:800;letter-spacing:-.02em}.stat span{font-size:13px;color:var(--ink2)}
+.fig{margin-top:22px;overflow-x:auto}
+.fig svg{display:block;min-width:980px}
+svg text{font-family:var(--mono);font-size:11.5px;fill:var(--mut)}
+.lb1{font-family:var(--sans);font-weight:700;font-size:15px;fill:var(--ink)}.lb2{font-size:11.5px;fill:var(--mut)}
+.hit{cursor:pointer}.hit:hover .ring{stroke-width:3}
+.sel .ring{stroke:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:14px;color:var(--ink2)}.legend span{display:inline-flex;align-items:center;gap:8px}
+.lg{width:14px;height:14px;display:inline-block;flex:none}
+.det{margin-top:18px;border:1px solid rgba(57,242,138,.35);border-radius:16px;padding:16px 18px;background:linear-gradient(90deg,rgba(57,242,138,.07),transparent 60%);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr) minmax(0,1.4fr);gap:20px;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}}
+.det .cap{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:4px}
+.det b{font-size:17px;font-weight:700}.det .w{font-family:var(--mono);font-size:12px;color:var(--g);margin-top:4px;display:block}
+.cards3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.c3{border:1px solid var(--line);border-radius:16px;padding:16px 18px;background:rgba(255,255,255,.015)}.c3 h3{font-size:16px;font-weight:700}.c3 p{font-size:14.5px;color:var(--ink2);margin-top:6px}
+.note{margin-top:20px;border-top:1px solid var(--line);padding-top:14px;font-size:13px;color:var(--mut)}
+.tip{position:fixed;pointer-events:none;background:#F4F3FA;color:#0A0912;border-radius:10px;padding:9px 12px;font-size:13px;line-height:1.45;z-index:20;opacity:0;transition:opacity .1s;max-width:300px;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+@media (max-width:900px){.stats{grid-template-columns:1fr 1fr}.cards3,.det{grid-template-columns:1fr}.bar .meta{margin-left:0;width:100%}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><div><div class="eyebrow">Jornada do cliente · modelo intermediário</div><h1>A jornada base <span>por tipo de projeto</span></h1></div><span class="badge">Datas e semanas ilustrativas</span></div>
+ <div class="bar" role="tablist" aria-label="Tipo de projeto"><span class="lab">VOCÊ ESTÁ VENDO</span><span id="tabs" style="display:contents"></span><span class="meta" id="meta"></span></div>
+ <section class="card" id="card"></section>
+ <p class="note">Protótipo de visualização da proposta para a Gerência de Customer Success 2027. O gerente é o dono da relação com o cliente; CS entra nos momentos definidos. Nas contas em risco ou com oportunidade estratégica, CS atua mais de perto, junto com o gerente.</p>
+</div>
+<div class="tip" id="tip"></div>
+<script>
+{
+/* tipos de contato de CS */
+const KT={
+ reu:{l:'CS na reunião do gerente',d:'CS entra na reunião que o gerente já tem com o cliente.'},
+ call:{l:'Call de feedback sem o time',d:'CS conversa a sós com o cliente; uma por mês, no momento disparado por um gatilho.'},
+ sin:{l:'Entrega importante sinalizada',d:'O gerente sinaliza no registro pós-reunião; a data é descoberta ao longo do projeto.'},
+ neg:{l:'CS com Negócios',d:'Momentos de valor e continuidade conduzidos junto com o analista de Negócios.'}
+};
+const T={
+ Discovery:{n:'01',sub:'Produto',semanas:4,ritmo:'cerca de 1 mês · reunião semanal da gerente de Produto com o cliente',
+  h:'Os contatos de CS no Discovery',d:'Exemplo de um Discovery de cerca de 4 semanas. A gerente de Produto conduz a relação; CS entra no onboarding, na apresentação do protótipo, na call de feedback antes do encerramento e na entrega do business case.',
+  fases:[['Onboarding',1,1],['Diagnóstico',2,2],['Protótipo',3,3],['Business case',4,4]],
+  ent:[[2,'Diagnóstico operacional'],[3,'Apresentação do protótipo',1],[4,'Business case']],
+  neg:[[0,'Passagem de bastão','Negócios passa a conta à gerente de Produto com o roteiro de passagem; CS valida o roteiro.']],
+  cs:[[1,'reu','Onboarding · 30 min','Me apresento como canal do cliente e observo a gerente apresentar a definição de sucesso e o indicador.','Início do projeto'],[3,'reu','Apresentação do protótipo','Momento de maior valor percebido do Discovery.','Base da jornada'],[4,'call','Call de feedback','A única call sem o time no Discovery: como o cliente viu o diagnóstico e o protótipo, e o que espera do que vem depois.','Gatilho: pré-encerramento'],[4,'reu','Entrega do business case','Comprovar o resultado projetado e abrir a continuidade.','Base da jornada']],
+  pos:{t:'continuidade',items:[['Conversa de continuidade','neg','Evolução para o Delivery a partir dos gargalos do Discovery, com Negócios.']]},
+  cards:[['O pico é o protótipo','É quando o cliente vê a solução pela primeira vez; CS está na sala.'],['Uma call, no fim','Em um mês, a call sem o time acontece antes do encerramento, para preparar a continuidade.'],['Gargalos viram oportunidade','O que o diagnóstico levanta e fica fora do escopo alimenta o mapa da conta e a conversa sobre o Delivery.']]},
+ Delivery:{n:'02',sub:'Tech',semanas:16,ritmo:'cerca de 4 meses · sprints semanais e reunião semanal do gerente com o cliente',
+  h:'Os contatos de CS no Delivery',d:'Exemplo de um Delivery de cerca de 16 semanas. O gerente de Tech conduz a relação; CS entra no onboarding, na homologação, nas calls de feedback mensais, nas entregas que o gerente sinaliza e na entrega formal.',
+  fases:[['Levantamento',1,2],['Primeira versão',3,6],['Integrações',7,10],['Homologação',11,13],['Produção',14,16]],
+  ent:[[6,'Primeira versão em uso',1],[13,'Homologação'],[16,'Entrega formal']],
+  neg:[[0,'Passagem de bastão','Negócios passa a conta ao gerente com o roteiro de passagem; CS valida o roteiro.']],
+  cs:[[1,'reu','Onboarding · 30 min','Me apresento como canal e observo o gerente apresentar a definição de sucesso, o indicador e a DoD.','Início do projeto'],[4,'call','Call de feedback','Sem gatilho no mês: acontece na última semana.','Sem gatilho: última semana do mês'],[7,'call','Call de feedback','Depois da primeira versão em uso.','Gatilho: depois de um marco'],[9,'sin','Integração com o ERP','O gerente sinalizou no registro que é a integração que o cliente mais valoriza.','Sinalizada no registro pós-reunião'],[12,'call','Call de feedback','A leitura do gerente divergiu do que apareceu na transcrição.','Gatilho: divergência'],[13,'reu','Homologação','Marco certo do Delivery de Tech.','Base da jornada'],[15,'call','Call de feedback','Antes do encerramento.','Gatilho: pré-encerramento'],[16,'reu','Entrega formal','Aceite pela definition of done combinada no onboarding.','Base da jornada']],
+  pos:{t:'pós-entrega',items:[['Implementação assistida','call','De 1 a 3 meses com dashboard e chat; CS acompanha o uso e uma call por mês.'],['Revisão de Valor','neg','O indicador combinado é comparado ao antes, com o analista de Negócios.']]},
+  cards:[['Sem reunião a mais para o cliente','CS entra nas reuniões que o gerente já tem; a call sem o time é a única a mais, uma por mês.'],['Datas descobertas, não impostas','As entregas importantes aparecem no registro pós-reunião do gerente, quando ficam próximas.'],['Um momento a sós com o cliente','Sem o gerente e o squad, o cliente fala do andamento e do time com mais liberdade.']]},
+ Synergy:{n:'03',sub:'Tech',semanas:26,ritmo:'contrato de cerca de 6 meses · iniciativas em sequência',
+  h:'Os contatos de CS no Synergy',d:'Exemplo de um Synergy de cerca de 6 meses, com iniciativas em sequência. O gerente da conta conduz a relação; CS entra no onboarding do contrato, nas calls de feedback mensais, nas entregas-chave de cada módulo e nas revisões trimestrais com Negócios.',
+  fases:[['Onboarding do contrato',1,2],['Iniciativa 1',3,9],['Iniciativa 2',10,17],['Iniciativa 3',18,26]],
+  ent:[[9,'Entrega do módulo 1',1],[17,'Entrega do módulo 2',1],[26,'Entrega do módulo 3',1]],
+  neg:[[0,'Passagem de bastão','Negócios passa a conta ao gerente; CS valida o roteiro.'],[13,'Revisão trimestral','Saúde, valor gerado e próximos passos, com Negócios.'],[26,'Revisão trimestral','Renovação e expansão para novos setores.']],
+  cs:[[1,'reu','Onboarding do contrato · 30 min','Objetivos da conta para todo o contrato e o indicador de sucesso.','Início do contrato'],[4,'call','Call de feedback','Primeiro mês do contrato.','Sem gatilho: última semana do mês'],[9,'sin','Entrega do módulo 1','Entrega-chave sinalizada pelo gerente; momento de ouvir o cliente.','Sinalizada no registro pós-reunião'],[10,'call','Call de feedback','Depois da primeira entrega-chave.','Gatilho: depois de um marco'],[13,'neg','Revisão trimestral','Com Negócios: saúde, valor gerado e próximos passos.','Ritual do Synergy'],[17,'sin','Entrega do módulo 2','Conta com potencial: momento de pedir indicação.','Sinalizada no registro pós-reunião'],[18,'call','Call de feedback','Depois da segunda entrega-chave.','Gatilho: depois de um marco'],[22,'call','Call de feedback','Sem gatilho no mês.','Sem gatilho: última semana do mês'],[25,'call','Call de feedback','Antes da renovação.','Gatilho: pré-encerramento'],[26,'neg','Revisão trimestral','Renovação e expansão para novos setores.','Ritual do Synergy']],
+  pos:{t:'renovação',items:[['Renovação do contrato','neg','Conduzida por Negócios, com a saúde da conta e o valor comprovado por CS.']]},
+  cards:[['Cada módulo é um pico','A entrega-chave se repete a cada iniciativa: CS aparece quando o gerente sinaliza.'],['Revisão a cada trimestre','CS e Negócios olham saúde, valor e próximos passos com o cliente.'],['Renovação preparada','O valor comprovado ao longo do contrato sustenta a conversa de renovação.']]}
+};
+let tipo='Delivery',sel=null;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function tabs(){document.getElementById('tabs').innerHTML=Object.entries(T).map(([k,v])=>`<button class="tab" role="tab" data-t="${k}" aria-selected="${tipo===k}"><span class="n">${v.n}</span>${k}</button>`).join('');document.getElementById('meta').textContent=T[tipo].sub+' · '+T[tipo].ritmo}
+function fig(){const t=T[tipo],N=t.semanas,W=1440,L=230,PW=150,R=W-PW-24,lw=(R-L)/N,X=w=>L+(w-.5)*lw,Hh=360;
+ const Y={neg:42,fase:100,ent:150,ger:208,cs:290};let g='';
+ // rótulos
+ [['neg','Negócios','passagem e valor'],['fase','Fases do cronograma','do gerente'],['ent','Entregas-chave','marcos do projeto'],['ger','Reunião do gerente','semanal, com o cliente'],['cs','CS','momentos definidos']].forEach(([k,a,b])=>g+=`<text x="0" y="${Y[k]-2}" class="lb1" ${k==='cs'?'style="fill:#39F28A"':''}>${a}</text><text x="0" y="${Y[k]+16}" class="lb2">${b}</text>`);
+ // grade de semanas
+ for(let w=1;w<=N;w++)g+=`<rect x="${X(w)-lw/2+3}" y="${Y.ent-9}" width="${lw-6}" height="18" rx="4" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.07)"/>`;
+ // fases
+ t.fases.forEach(([n,a,b])=>{const x1=X(a)-lw/2+2,x2=X(b)+lw/2-2;g+=`<rect x="${x1}" y="${Y.fase-18}" width="${x2-x1}" height="34" rx="9" fill="#2A2160" stroke="#5B47C9"/><text x="${(x1+x2)/2}" y="${Y.fase+4}" text-anchor="middle" style="fill:#E9E5FF;font-size:${x2-x1<120?11:13}px">${esc(n.length*7.8>x2-x1-10?n.split(' ')[0]:n)}</text>`});
+ // linhas das entregas
+ t.ent.forEach(([w,n,pk])=>{g+=`<line x1="${X(w)+lw/2}" x2="${X(w)+lw/2}" y1="${Y.fase-24}" y2="${Y.cs+30}" stroke="#FFC24B" stroke-opacity=".5" stroke-dasharray="3 4"/><g class="hit" data-tip="<b>${esc(n)}</b>${pk?'<br>★ maior valor percebido':''}"><rect x="${X(w)+lw/2-9}" y="${Y.ent-9}" width="18" height="18" transform="rotate(45 ${X(w)+lw/2} ${Y.ent})" fill="#FFC24B" ${pk?'style="filter:drop-shadow(0 0 8px #FFC24B)"':''}/></g>`});
+ // negócios
+ t.neg.forEach(([w,n,d],i)=>{const x=w===0?L-4:X(w);g+=`<g class="hit" data-tip="<b>${esc(n)}</b><br>${esc(d)}"><circle cx="${x}" cy="${Y.neg}" r="9" fill="#2A2160" stroke="#9B84FF" stroke-width="2"/><text x="${x}" y="${Y.neg-16}" text-anchor="middle" style="fill:#C9BEFF;font-size:11px">${esc(n)}</text></g>`});
+ // reuniões do gerente
+ const csW=new Set(t.cs.filter(c=>c[1]==='reu'||c[1]==='sin').map(c=>c[0]));
+ for(let w=1;w<=N;w++){const on=csW.has(w);g+=on?`<circle cx="${X(w)}" cy="${Y.ger}" r="11" fill="none" stroke="#39F28A" stroke-width="2"/><circle cx="${X(w)}" cy="${Y.ger}" r="6" fill="#9B84FF"/>`:`<circle cx="${X(w)}" cy="${Y.ger}" r="5.5" fill="#8E77FF" fill-opacity=".85"/>`}
+ // contatos de CS
+ const seen={};t.cs.forEach((c,i)=>{const[w,k,n,d,why]=c;seen[w]=(seen[w]||0)+1;const x=X(w)+(seen[w]>1?(t.cs.filter(z=>z[0]===w)[0][1]==='reu'?-34:34):0),y=Y.cs+(seen[w]>1?-0:0),s=sel===i;
+  let shape='';
+  if(k==='reu')shape=`<line x1="${X(w)}" x2="${x}" y1="${Y.ger+12}" y2="${y-15}" stroke="#39F28A" stroke-width="2"/><circle class="ring" cx="${x}" cy="${y}" r="17" fill="none" stroke="rgba(57,242,138,.35)" stroke-width="2"/><circle cx="${x}" cy="${y}" r="12" fill="#39F28A"/>`;
+  if(k==='sin')shape=`<line x1="${X(w)}" x2="${x}" y1="${Y.ger+12}" y2="${y-15}" stroke="#39F28A" stroke-width="2" stroke-dasharray="3 3"/><circle class="ring" cx="${x}" cy="${y}" r="15" fill="rgba(57,242,138,.08)" stroke="#39F28A" stroke-width="2" stroke-dasharray="4 3"/><circle cx="${x}" cy="${y}" r="5" fill="#39F28A"/>`;
+  if(k==='call')shape=`<circle class="ring" cx="${x}" cy="${y}" r="15" fill="#0A0912" stroke="#39F28A" stroke-width="2.5"/><circle cx="${x}" cy="${y}" r="6" fill="none" stroke="#39F28A" stroke-width="2"/>`;
+  if(k==='neg')shape=`<circle class="ring" cx="${x}" cy="${y}" r="15" fill="rgba(124,92,255,.2)" stroke="#9B84FF" stroke-width="2.5"/><circle cx="${x}" cy="${y}" r="6" fill="#39F28A"/>`;
+  g+=`<g class="hit ${s?'sel':''}" data-c="${i}" data-tip="<b>${esc(n)}</b><br>${esc(KT[k].l)} · semana ${w}">${shape}</g>`});
+ // pós
+ const px=W-PW,py=Y.fase-26,ph=Y.cs+34-py;g+=`<rect x="${px}" y="${py}" width="${PW-4}" height="${ph}" rx="16" fill="rgba(57,242,138,.05)" stroke="#39F28A" stroke-opacity=".6" stroke-dasharray="6 6"/><text x="${px+(PW-4)/2}" y="${py+24}" text-anchor="middle" style="fill:#39F28A;font-size:12.5px">${t.pos.t}</text>`;
+ t.pos.items.forEach((it,j)=>{const nI=t.pos.items.length,yy=nI===1?py+ph/2:py+ph*(.32+j*.4);g+=`<g class="hit" data-tip="<b>${esc(it[0])}</b><br>${esc(it[2])}"><circle cx="${px+(PW-4)/2}" cy="${yy}" r="20" fill="#0A0912" stroke="${it[1]==='neg'?'#9B84FF':'#39F28A'}" stroke-width="2.5"/><text x="${px+(PW-4)/2}" y="${yy+4}" text-anchor="middle" style="fill:#fff;font-family:var(--sans);font-weight:700;font-size:11px">${it[1]==='neg'?'N+CS':'CS'}</text><text x="${px+(PW-4)/2}" y="${yy+36}" text-anchor="middle" style="fill:var(--ink2);font-size:10.5px">${esc({'Conversa de continuidade':'Continuidade','Implementação assistida':'Implementação','Renovação do contrato':'Renovação'}[it[0]]||it[0])}</text></g>`});
+ g+=`<text x="${X(1)}" y="${Hh-6}" text-anchor="middle">semana 1</text><text x="${X(N)}" y="${Hh-6}" text-anchor="middle">semana ${N}</text>`;
+ return `<svg viewBox="0 0 ${W} ${Hh}" width="100%" role="img" aria-label="Contatos de CS no ${tipo}">${g}</svg>`}
+function render(){const t=T[tipo],cnt=k=>t.cs.filter(c=>c[1]===k).length;tabs();
+ const c=sel!=null?t.cs[sel]:null;
+ document.getElementById('card').innerHTML=`<div class="k">Contatos de CS · ${tipo}</div><h2>${t.h}</h2><p class="sub">${t.d}</p>
+ <div class="stats"><div class="stat"><b>${t.cs.length}</b><span>momentos de CS em ${t.semanas} semanas</span></div><div class="stat"><b>${cnt('call')}</b><span>calls de feedback sem o time</span></div><div class="stat"><b>${cnt('reu')+cnt('sin')}</b><span>em reuniões que o gerente já tem</span></div><div class="stat"><b>0</b><span>reuniões a mais além da call mensal</span></div></div>
+ <div class="fig">${fig()}</div>
+ <div class="legend"><span><svg class="lg" viewBox="0 0 14 14"><rect x="3" y="3" width="8" height="8" transform="rotate(45 7 7)" fill="#FFC24B"/></svg>Entrega-chave</span><span><svg class="lg" viewBox="0 0 14 14"><circle cx="7" cy="7" r="4.5" fill="#8E77FF"/></svg>Reunião semanal do gerente</span>${Object.entries(KT).map(([k,v])=>`<span><svg class="lg" viewBox="0 0 16 16">${k==='reu'?'<circle cx="8" cy="8" r="6" fill="#39F28A"/>':k==='sin'?'<circle cx="8" cy="8" r="6" fill="none" stroke="#39F28A" stroke-width="1.6" stroke-dasharray="3 2"/><circle cx="8" cy="8" r="2.5" fill="#39F28A"/>':k==='call'?'<circle cx="8" cy="8" r="6" fill="none" stroke="#39F28A" stroke-width="2"/><circle cx="8" cy="8" r="2.5" fill="none" stroke="#39F28A" stroke-width="1.4"/>':'<circle cx="8" cy="8" r="6" fill="rgba(124,92,255,.3)" stroke="#9B84FF" stroke-width="1.6"/><circle cx="8" cy="8" r="2.5" fill="#39F28A"/>'}</svg>${v.l}</span>`).join('')}</div>
+ ${c?`<div class="det"><div><span class="cap">Semana ${c[0]} · ${KT[c[1]].l}</span><b>${esc(c[2])}</b><span class="w">${esc(c[4])}</span></div><div><span class="cap">O que CS faz</span>${esc(c[3])}</div><div><span class="cap">Como funciona</span>${esc(KT[c[1]].d)}</div></div>`:`<div class="det" style="border-color:var(--line);background:none"><div><span class="cap">Dica</span><b>Clique em um momento de CS</b></div><div class="ink2" style="grid-column:span 2;color:var(--ink2)">Cada ponto verde abre o que CS faz naquele momento, por que ele existe e qual gatilho o dispara.</div></div>`}
+ <div class="cards3">${t.cards.map(x=>`<div class="c3"><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join('')}</div>`}
+document.addEventListener('click',e=>{const tb=e.target.closest('[data-t]');if(tb){tipo=tb.dataset.t;sel=null;try{history.replaceState(null,'','#'+tipo.toLowerCase())}catch(_){location.hash=tipo.toLowerCase()}render();return}
+ const c=e.target.closest('[data-c]');if(c){sel=sel===+c.dataset.c?null:+c.dataset.c;render()}});
+const tip=document.getElementById('tip');
+document.addEventListener('mousemove',e=>{const t=e.target.closest&&e.target.closest('[data-tip]');if(!t){tip.style.opacity=0;return}tip.innerHTML=t.getAttribute('data-tip');tip.style.opacity=1;tip.style.left=Math.min(e.clientX+14,innerWidth-310)+'px';tip.style.top=Math.max(e.clientY-14-tip.offsetHeight,8)+'px'});
+const h=(location.hash||'').slice(1);const m=Object.keys(T).find(k=>k.toLowerCase()===h);if(m)tipo=m;
+render();
+}
+</script>
+</body>
+</html>
